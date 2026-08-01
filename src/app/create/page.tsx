@@ -58,6 +58,7 @@ function CreateDiagramContent() {
 
   /**
    * Handles the diagram generation flow.
+   * Calls API Gateway directly for generation (bypasses Amplify's 25s SSR limit).
    * Uses the API client which routes to local Next.js routes or API Gateway.
    */
   const handleGenerate = useCallback(
@@ -67,10 +68,45 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        const data = await generateDiagram({
-          prompt,
-          templateId: selectedTemplateId || undefined,
+        // Call API Gateway directly for generation to bypass Amplify's 25s SSR timeout
+        const apiGatewayUrl = 'https://kabcjmx4h3.execute-api.ap-south-2.amazonaws.com';
+        const response = await fetch(`${apiGatewayUrl}/api/diagrams/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt,
+            templateId: selectedTemplateId || undefined,
+          }),
         });
+
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+          const code = body?.code as string | undefined;
+
+          if (response.status === 422 && code === 'PARSE_FAILURE') {
+            const parseError = createParseError(prompt);
+            if (body?.suggestions) {
+              parseError.suggestions = body.suggestions as string[];
+            }
+            setError({ message: parseError.message, suggestions: parseError.suggestions });
+            setGenerationError(parseError);
+            return;
+          }
+
+          if (response.status === 504 || code === 'TIMEOUT') {
+            const timeoutError = createTimeoutError();
+            setError({ message: timeoutError.message });
+            setGenerationError(timeoutError);
+            return;
+          }
+
+          const apiError = createApiError(response.status);
+          setError({ message: apiError.message });
+          setGenerationError(apiError);
+          return;
+        }
+
+        const data = await response.json();
 
         // Success: transition to generating-diagram step
         setStep('generating-diagram');
@@ -94,7 +130,6 @@ function CreateDiagramContent() {
           const body = error.body as Record<string, unknown> | undefined;
           const code = body?.code as string | undefined;
 
-          // Handle specific error codes from the API
           if (error.status === 422 && code === 'PARSE_FAILURE') {
             const parseError = createParseError(prompt);
             if (body?.suggestions) {
@@ -112,7 +147,6 @@ function CreateDiagramContent() {
             return;
           }
 
-          // Generic API error
           const apiError = createApiError(error.status);
           setError({ message: apiError.message });
           setGenerationError(apiError);

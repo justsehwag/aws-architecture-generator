@@ -140,7 +140,12 @@ ec2, lambda, ecs, eks, fargate, elastic-beanstalk, lightsail, batch, outposts, a
 // Clients (initialized outside handler for Lambda warm starts)
 // ============================================================
 
-const bedrockClient = new BedrockRuntimeClient({ region: BEDROCK_REGION });
+const bedrockClient = new BedrockRuntimeClient({
+  region: BEDROCK_REGION,
+  ...(process.env.BEDROCK_ACCESS_KEY_ID && process.env.BEDROCK_SECRET_ACCESS_KEY
+    ? { credentials: { accessKeyId: process.env.BEDROCK_ACCESS_KEY_ID, secretAccessKey: process.env.BEDROCK_SECRET_ACCESS_KEY } }
+    : {}),
+});
 const ddbDocClient = DynamoDBDocumentClient.from(
   new DynamoDBClient({ region: process.env.REGION || 'us-east-1' })
 );
@@ -153,7 +158,7 @@ function corsHeaders(): Record<string, string> {
   return {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Amz-Date, X-Api-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 }

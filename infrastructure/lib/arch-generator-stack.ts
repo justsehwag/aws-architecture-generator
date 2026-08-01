@@ -264,8 +264,8 @@ export class ArchGeneratorStack extends cdk.Stack {
       memorySize: 1024,
       environment: {
         ...commonLambdaProps.environment,
-        BEDROCK_MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
-        BEDROCK_REGION: 'us-east-1',
+        BEDROCK_MODEL_ID: 'global.anthropic.claude-sonnet-4-6',
+        BEDROCK_REGION: 'ap-south-2',
       },
     } as lambda.FunctionProps);
 
@@ -383,12 +383,11 @@ export class ArchGeneratorStack extends cdk.Stack {
     // API Routes
     // ============================================================
 
-    // Generate diagram
+    // Generate diagram — no authorizer so frontend can call directly (avoids Amplify 25s SSR limit)
     httpApi.addRoutes({
       path: '/api/diagrams/generate',
       methods: [apigatewayv2.HttpMethod.POST],
       integration: new apigatewayv2Integrations.HttpLambdaIntegration('GenerateIntegration', generateFn),
-      authorizer,
     });
 
     // Import diagram
