@@ -16,6 +16,7 @@ import {
   createNetworkError,
   type GenerationError as GenerationErrorData,
 } from '@/lib/errors/generation-errors';
+import { generateDiagram, ApiError } from '@/api';
 
 /**
  * Create Diagram page content.
@@ -57,7 +58,7 @@ function CreateDiagramContent() {
 
   /**
    * Handles the diagram generation flow.
-   * Calls POST /api/diagrams/generate and navigates on success.
+   * Uses the API client which routes to local Next.js routes or API Gateway.
    */
   const handleGenerate = useCallback(
     async (prompt: string) => {
@@ -66,47 +67,13 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        const response = await fetch('/api/diagrams/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt,
-            templateId: selectedTemplateId || undefined,
-          }),
+        const data = await generateDiagram({
+          prompt,
+          templateId: selectedTemplateId || undefined,
         });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-
-          // Handle specific error codes from the API
-          if (response.status === 422 && errorData?.code === 'PARSE_FAILURE') {
-            const parseError = createParseError(prompt);
-            if (errorData.suggestions) {
-              parseError.suggestions = errorData.suggestions;
-            }
-            setError({ message: parseError.message, suggestions: parseError.suggestions });
-            setGenerationError(parseError);
-            return;
-          }
-
-          if (response.status === 504 || errorData?.code === 'TIMEOUT') {
-            const timeoutError = createTimeoutError();
-            setError({ message: timeoutError.message });
-            setGenerationError(timeoutError);
-            return;
-          }
-
-          // Generic API error
-          const apiError = createApiError(response.status);
-          setError({ message: apiError.message });
-          setGenerationError(apiError);
-          return;
-        }
 
         // Success: transition to generating-diagram step
         setStep('generating-diagram');
-
-        const data = await response.json();
 
         // Transition to analyzing step briefly
         setStep('analyzing');
@@ -118,7 +85,36 @@ function CreateDiagramContent() {
         if (data.diagramId) {
           router.push(`/diagram/${data.diagramId}`);
         }
-      } catch {
+      } catch (error) {
+        if (error instanceof ApiError) {
+          const body = error.body as Record<string, unknown> | undefined;
+          const code = body?.code as string | undefined;
+
+          // Handle specific error codes from the API
+          if (error.status === 422 && code === 'PARSE_FAILURE') {
+            const parseError = createParseError(prompt);
+            if (body?.suggestions) {
+              parseError.suggestions = body.suggestions as string[];
+            }
+            setError({ message: parseError.message, suggestions: parseError.suggestions });
+            setGenerationError(parseError);
+            return;
+          }
+
+          if (error.status === 504 || code === 'TIMEOUT') {
+            const timeoutError = createTimeoutError();
+            setError({ message: timeoutError.message });
+            setGenerationError(timeoutError);
+            return;
+          }
+
+          // Generic API error
+          const apiError = createApiError(error.status);
+          setError({ message: apiError.message });
+          setGenerationError(apiError);
+          return;
+        }
+
         // Network or unexpected error
         const networkError = createNetworkError();
         setError({ message: networkError.message });

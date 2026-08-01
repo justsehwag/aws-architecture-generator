@@ -262,7 +262,26 @@ export class ArchGeneratorStack extends cdk.Stack {
       code: lambda.Code.fromAsset('lambda/generate'),
       description: 'Processes natural language prompts via LLM and produces architecture specs',
       memorySize: 1024,
+      environment: {
+        ...commonLambdaProps.environment,
+        BEDROCK_MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
+        BEDROCK_REGION: 'us-east-1',
+      },
     } as lambda.FunctionProps);
+
+    // Grant Generate Lambda permission to invoke Bedrock models
+    generateFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        sid: 'BedrockInvokeModel',
+        effect: iam.Effect.ALLOW,
+        actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+        resources: [
+          `arn:aws:bedrock:*:${cdk.Aws.ACCOUNT_ID}:inference-profile/*`,
+          'arn:aws:bedrock:*::foundation-model/anthropic.*',
+          'arn:aws:bedrock:*::foundation-model/amazon.*',
+        ],
+      })
+    );
 
     // Render Lambda - Draw.io MCP diagram rendering
     const renderFn = new lambda.Function(this, 'RenderLambda', {
