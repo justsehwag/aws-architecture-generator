@@ -33,9 +33,18 @@ import {
 
 // ─── S3 Client Configuration ─────────────────────────────────────────────────
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION ?? 'us-east-1',
-});
+const s3AccessKeyId = process.env.BEDROCK_ACCESS_KEY_ID;
+const s3SecretAccessKey = process.env.BEDROCK_SECRET_ACCESS_KEY;
+
+const s3ClientConfig: { region: string; credentials?: { accessKeyId: string; secretAccessKey: string } } = {
+  region: process.env.S3_REGION ?? process.env.AWS_REGION ?? 'ap-south-2',
+};
+
+if (s3AccessKeyId && s3SecretAccessKey) {
+  s3ClientConfig.credentials = { accessKeyId: s3AccessKeyId, secretAccessKey: s3SecretAccessKey };
+}
+
+const s3Client = new S3Client(s3ClientConfig);
 
 // ─── Error Classes ────────────────────────────────────────────────────────────
 

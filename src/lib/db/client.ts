@@ -3,11 +3,22 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 /**
  * DynamoDB client configuration.
- * Uses environment variables for region and table names.
+ * Uses explicit credentials from BEDROCK_ACCESS_KEY_ID/BEDROCK_SECRET_ACCESS_KEY
+ * for Amplify SSR where default credentials are not available.
+ * Falls back to default credential chain for local dev / Lambda.
  */
-const client = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'us-east-1',
-});
+const accessKeyId = process.env.BEDROCK_ACCESS_KEY_ID;
+const secretAccessKey = process.env.BEDROCK_SECRET_ACCESS_KEY;
+
+const clientConfig: { region: string; credentials?: { accessKeyId: string; secretAccessKey: string } } = {
+  region: process.env.DYNAMODB_REGION || process.env.AWS_REGION || 'ap-south-2',
+};
+
+if (accessKeyId && secretAccessKey) {
+  clientConfig.credentials = { accessKeyId, secretAccessKey };
+}
+
+const client = new DynamoDBClient(clientConfig);
 
 /**
  * DynamoDB DocumentClient with marshalling options.
