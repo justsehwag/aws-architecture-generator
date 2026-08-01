@@ -31,13 +31,13 @@ function SignupContent() {
           <div className="rounded-lg border bg-card p-6 shadow-sm">
             <h1 className="text-2xl font-bold">Check your email</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              We sent a verification link to <strong>{email}</strong>. Please verify your email and then sign in.
+              We sent a verification code to <strong>{email}</strong>. Enter it below to verify your account.
             </p>
             <a
-              href="/auth/login"
+              href={`/auth/verify?email=${encodeURIComponent(email)}`}
               className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
-              Go to Sign In
+              Enter Verification Code
             </a>
           </div>
         </div>
