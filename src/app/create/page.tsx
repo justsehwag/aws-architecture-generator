@@ -58,8 +58,7 @@ function CreateDiagramContent() {
 
   /**
    * Handles the diagram generation flow.
-   * Calls API Gateway directly for generation (bypasses Amplify's 25s SSR limit).
-   * Uses the API client which routes to local Next.js routes or API Gateway.
+   * Calls the Amplify SSR API route for generation.
    */
   const handleGenerate = useCallback(
     async (prompt: string) => {
@@ -68,9 +67,7 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        // Call API Gateway directly for generation to bypass Amplify's 25s SSR timeout
-        const apiGatewayUrl = 'https://kabcjmx4h3.execute-api.ap-south-2.amazonaws.com';
-        const response = await fetch(`${apiGatewayUrl}/api/diagrams/generate`, {
+        const response = await fetch('/api/diagrams/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -108,52 +105,18 @@ function CreateDiagramContent() {
 
         const data = await response.json();
 
-        // Success: transition to generating-diagram step
+        // Success
         setStep('generating-diagram');
-
-        // Transition to analyzing step briefly
         setStep('analyzing');
-
-        // Mark as ready
         setReady();
 
-        // Navigate to the diagram viewer
         if (data.diagramId) {
-          // Store generation result in sessionStorage for immediate use by diagram viewer
           try {
             sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data));
-          } catch { /* ignore storage errors */ }
+          } catch { /* ignore */ }
           router.push(`/diagram/${data.diagramId}`);
         }
-      } catch (error) {
-        if (error instanceof ApiError) {
-          const body = error.body as Record<string, unknown> | undefined;
-          const code = body?.code as string | undefined;
-
-          if (error.status === 422 && code === 'PARSE_FAILURE') {
-            const parseError = createParseError(prompt);
-            if (body?.suggestions) {
-              parseError.suggestions = body.suggestions as string[];
-            }
-            setError({ message: parseError.message, suggestions: parseError.suggestions });
-            setGenerationError(parseError);
-            return;
-          }
-
-          if (error.status === 504 || code === 'TIMEOUT') {
-            const timeoutError = createTimeoutError();
-            setError({ message: timeoutError.message });
-            setGenerationError(timeoutError);
-            return;
-          }
-
-          const apiError = createApiError(error.status);
-          setError({ message: apiError.message });
-          setGenerationError(apiError);
-          return;
-        }
-
-        // Network or unexpected error
+      } catch {
         const networkError = createNetworkError();
         setError({ message: networkError.message });
         setGenerationError(networkError);
