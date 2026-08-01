@@ -1,6 +1,8 @@
 "use client";
 
-import { Menu, Search, User } from "lucide-react";
+import { useState } from "react";
+import { Menu, Search, User, LogOut, Settings } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -9,6 +11,8 @@ interface TopNavProps {
 }
 
 export function TopNav({ onMenuToggle }: TopNavProps) {
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   return (
     <header
       role="banner"
@@ -45,9 +49,39 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
 
       <div className="flex items-center gap-1" role="toolbar" aria-label="User actions">
         <ThemeToggle />
-        <Button variant="ghost" size="icon" aria-label="User menu" aria-haspopup="true">
-          <User className="h-5 w-5" aria-hidden="true" />
-        </Button>
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="User menu"
+            aria-haspopup="true"
+            aria-expanded={userMenuOpen}
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+          >
+            <User className="h-5 w-5" aria-hidden="true" />
+          </Button>
+          {userMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-md border bg-popover p-1 shadow-lg">
+                <Link
+                  href="/settings"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                >
+                  <Settings className="h-4 w-4" /> Settings
+                </Link>
+                <Link
+                  href="/auth/login"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-accent"
+                >
+                  <LogOut className="h-4 w-4" /> Sign Out
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
