@@ -34,25 +34,71 @@ interface DiagramData {
 
 /**
  * Generates a basic Draw.io XML diagram from an ArchitectureSpec.
- * Places services in a grid layout with connections.
+ * Uses official AWS architecture icons from the service registry.
+ * Places services in a grid layout with orthogonal edge connections.
  */
-function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label: string; type: string }>; connections?: Array<{ id: string; sourceId: string; targetId: string; label?: string }> }): string {
+function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label: string; type: string; groupId?: string }>; connections?: Array<{ id: string; sourceId: string; targetId: string; label?: string }>; groups?: Array<{ id: string; label: string; type: string; children?: string[] }> }): string {
   const services = spec.services || [];
   const connections = spec.connections || [];
-  const cols = Math.ceil(Math.sqrt(services.length));
+  const cols = Math.max(3, Math.ceil(Math.sqrt(services.length)));
+
+  // AWS icon style map (subset for quick rendering)
+  const awsIcons: Record<string, string> = {
+    'ec2': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;',
+    'lambda': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;',
+    'ecs': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecs;',
+    'eks': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eks;',
+    'fargate': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;',
+    's3': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;',
+    'dynamodb': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;',
+    'rds': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;',
+    'aurora': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.aurora;',
+    'api-gateway': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;',
+    'cloudfront': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;',
+    'route53': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_53;',
+    'alb': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;',
+    'nlb': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;',
+    'elb': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;',
+    'vpc': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpc;',
+    'cognito': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;',
+    'sqs': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;',
+    'sns': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sns;',
+    'kinesis': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kinesis;',
+    'cloudwatch': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;',
+    'iam': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.iam;',
+    'kms': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kms;',
+    'waf': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.waf;',
+    'nat-gateway': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpc_nat_gateway;',
+    'elasticache': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elasticache;',
+    'step-functions': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.step_functions;',
+    'eventbridge': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;',
+    'sagemaker': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sagemaker;',
+    'bedrock': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;',
+    'opensearch': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.opensearch_service;',
+    'redshift': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.redshift;',
+    'glue': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.glue;',
+    'athena': 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.athena;',
+  };
+
+  const defaultIcon = 'shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.general_AWS_cloud;';
+  const baseStyle = 'labelBackgroundColor=none;sketch=0;fillColor=#232F3E;fontColor=#232F3E;aspect=fixed;';
 
   let cells = '<mxCell id="0"/><mxCell id="1" parent="0"/>';
   
   services.forEach((svc, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
-    const x = 80 + col * 200;
-    const y = 80 + row * 150;
-    cells += `<mxCell id="${svc.id}" value="${svc.label}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;fontColor=#ffffff;strokeColor=#232F3E;" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="140" height="60" as="geometry"/></mxCell>`;
+    const x = 100 + col * 220;
+    const y = 100 + row * 180;
+    const icon = awsIcons[svc.type] || defaultIcon;
+    const style = `${icon}${baseStyle}`;
+    const escapedLabel = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="${style}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="78" height="78" as="geometry"/></mxCell>`;
   });
 
   connections.forEach((conn) => {
-    cells += `<mxCell id="${conn.id}" value="${conn.label || ''}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
+    const escapedLabel = (conn.label || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    cells += `<mxCell id="${conn.id}" value="${escapedLabel}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
   });
 
   return `<?xml version="1.0" encoding="UTF-8"?><mxfile><diagram name="Architecture"><mxGraphModel><root>${cells}</root></mxGraphModel></diagram></mxfile>`;
@@ -79,6 +125,7 @@ export default function DiagramViewerPage() {
 
   // --- State ---
   const [diagramData, setDiagramData] = React.useState<DiagramData | null>(null);
+  const [cachedExplanation, setCachedExplanation] = React.useState<unknown>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
@@ -118,6 +165,9 @@ export default function DiagramViewerPage() {
             drawioXml: xml,
           });
           xmlRef.current = xml;
+          if (cachedData.explanation) {
+            setCachedExplanation(cachedData.explanation);
+          }
           setIsLoading(false);
           return;
         }
@@ -362,6 +412,7 @@ export default function DiagramViewerPage() {
                 {activeTab === "explanation" && (
                   <ExplanationPanel
                     diagramId={diagramData.diagramId}
+                    explanation={cachedExplanation as never}
                     className="border-l-0"
                   />
                 )}
