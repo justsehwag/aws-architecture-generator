@@ -74,6 +74,20 @@ export default function DiagramViewerPage() {
       setError(null);
 
       try {
+        // Check sessionStorage first (data from generation)
+        const cached = sessionStorage.getItem(`diagram_${diagramId}`);
+        if (cached) {
+          const cachedData = JSON.parse(cached);
+          setDiagramData({
+            diagramId: cachedData.diagramId ?? diagramId,
+            name: cachedData.architectureSpec?.name ?? "Generated Diagram",
+            drawioXml: cachedData.drawioXml ?? "",
+          });
+          xmlRef.current = cachedData.drawioXml ?? "";
+          setIsLoading(false);
+          return;
+        }
+
         const response = await fetch(`/api/diagrams/${diagramId}`);
         if (!response.ok) {
           if (response.status === 404) {

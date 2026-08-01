@@ -83,6 +83,10 @@ function CreateDiagramContent() {
 
         // Navigate to the diagram viewer
         if (data.diagramId) {
+          // Store generation result in sessionStorage for immediate use by diagram viewer
+          try {
+            sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data));
+          } catch { /* ignore storage errors */ }
           router.push(`/diagram/${data.diagramId}`);
         }
       } catch (error) {
