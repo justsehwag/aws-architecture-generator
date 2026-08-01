@@ -370,11 +370,17 @@ export default function DiagramViewerPage() {
                 hidden={activeTab !== "analysis"}
                 className="h-full"
               >
-                {activeTab === "analysis" && (
+                {activeTab === "analysis" && !isFromCache && (
                   <AnalysisPanel
                     diagramId={diagramData.diagramId}
                     className="border-l-0"
                   />
+                )}
+                {activeTab === "analysis" && isFromCache && (
+                  <div className="p-4 text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-foreground mb-2">Architecture Analysis</h3>
+                    <p>Analysis is computed from the generated architecture. Save the diagram to enable full Well-Architected analysis.</p>
+                  </div>
                 )}
               </div>
 
@@ -385,8 +391,14 @@ export default function DiagramViewerPage() {
                 hidden={activeTab !== "cost"}
                 className="h-full p-4"
               >
-                {activeTab === "cost" && (
+                {activeTab === "cost" && !isFromCache && (
                   <CostPanel diagramId={diagramData.diagramId} />
+                )}
+                {activeTab === "cost" && isFromCache && (
+                  <div className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-foreground mb-2">Cost Estimation</h3>
+                    <p>Save the diagram to enable cost estimation.</p>
+                  </div>
                 )}
               </div>
 
@@ -413,11 +425,17 @@ export default function DiagramViewerPage() {
                 hidden={activeTab !== "versions"}
                 className="h-full p-4"
               >
-                {activeTab === "versions" && (
+                {activeTab === "versions" && !isFromCache && (
                   <VersionHistory
                     diagramId={diagramData.diagramId}
                     onRestoreSuccess={handleVersionRestore}
                   />
+                )}
+                {activeTab === "versions" && isFromCache && (
+                  <div className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-foreground mb-2">Version History</h3>
+                    <p>Save the diagram to enable version history.</p>
+                  </div>
                 )}
               </div>
             </div>
