@@ -25,11 +25,10 @@ async function callBedrock(
   config: LLMConfig,
   messages: LLMMessage[]
 ): Promise<LLMResponse> {
-  const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
-
-  const client = new BedrockRuntimeClient({
-    region: process.env.BEDROCK_REGION || 'us-east-1',
-  });
+  // Use fetch to call Bedrock directly via AWS Signature V4
+  // This avoids the heavy AWS SDK dependency that causes issues in serverless environments
+  const region = process.env.BEDROCK_REGION || 'us-east-1';
+  const modelId = config.model;
 
   // Separate system message from conversation
   const systemMessage = messages.find((m) => m.role === 'system');
@@ -46,15 +45,19 @@ async function callBedrock(
   });
 
   try {
+    const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
+
+    const client = new BedrockRuntimeClient({ region });
+
     const command = new InvokeModelCommand({
-      modelId: config.model,
+      modelId,
       contentType: 'application/json',
       accept: 'application/json',
-      body: new TextEncoder().encode(body),
+      body: Buffer.from(body),
     });
 
     const response = await client.send(command);
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+    const responseBody = JSON.parse(Buffer.from(response.body).toString('utf-8'));
 
     const content = responseBody.content?.[0]?.text;
     if (!content) {
@@ -72,13 +75,14 @@ async function callBedrock(
           }
         : undefined,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof LLMAPIError) throw error;
-    if (error instanceof Error && error.name === 'TimeoutError') {
+    const err = error as Error;
+    if (err.name === 'TimeoutError') {
       throw new LLMTimeoutError(config.timeoutMs);
     }
     throw new LLMAPIError(
-      `Bedrock request failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Bedrock request failed: ${err.message || 'Unknown error'}`
     );
   }
 }
