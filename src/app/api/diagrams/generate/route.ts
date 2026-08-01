@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof LLMAPIError) {
       return NextResponse.json(
         {
-          error: 'The AI service encountered an error. Please try again later.',
+          error: `AI service error: ${error.message}`,
           code: 'LLM_ERROR',
         },
         { status: 502 }
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     // Unexpected errors
     return NextResponse.json(
       {
-        error: 'An unexpected error occurred during generation.',
+        error: `Unexpected error: ${error instanceof Error ? error.message : 'Unknown'}`,
         code: 'INTERNAL_ERROR',
       },
       { status: 500 }

@@ -94,7 +94,7 @@ export function getLLMConfig(): LLMConfig {
 
   if (provider === 'bedrock') {
     apiKey = ''; // Bedrock uses IAM credentials, no API key needed
-    model = process.env.LLM_MODEL || 'us.anthropic.claude-sonnet-4-5-20250514-v1:0';
+    model = process.env.LLM_MODEL || 'anthropic.claude-sonnet-4-20250514-v1:0';
   } else if (provider === 'anthropic') {
     apiKey = process.env.ANTHROPIC_API_KEY || '';
     model = process.env.LLM_MODEL || 'claude-sonnet-4-20250514';
