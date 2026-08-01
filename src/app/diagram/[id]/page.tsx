@@ -74,8 +74,10 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
   services.forEach((svc, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
-    const x = 80 + col * 200;
-    const y = 80 + row * 140;
+    // Use LLM-provided position if available, otherwise grid layout
+    const pos = (svc as unknown as { position?: { x: number; y: number } }).position;
+    const x = pos?.x ?? (80 + col * 200);
+    const y = pos?.y ?? (80 + row * 140);
     const cat = serviceCategory[svc.type] || 'general';
     const colors = categoryColors[cat] || categoryColors.general;
     const escapedLabel = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -163,6 +165,16 @@ export default function DiagramViewerPage() {
             setCachedExplanation(cachedData.explanation);
           }
           setIsFromCache(true);
+          // Also save to localStorage as draft
+          try {
+            const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]');
+            const exists = drafts.some((d: { diagramId: string }) => d.diagramId === cachedData.diagramId);
+            if (!exists) {
+              drafts.unshift({ diagramId: cachedData.diagramId, name: spec?.name || 'Untitled', createdAt: new Date().toISOString(), spec });
+              if (drafts.length > 20) drafts.pop();
+              localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
+            }
+          } catch { /* ignore */ }
           setIsLoading(false);
           return;
         }
@@ -202,6 +214,26 @@ export default function DiagramViewerPage() {
     getContent: () => xmlRef.current || null,
     enabled: !!diagramData,
   });
+
+  // --- Warn before leaving + auto-save draft to localStorage ---
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (diagramData && xmlRef.current) {
+        // Auto-save draft to localStorage
+        try {
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]');
+          const idx = drafts.findIndex((d: { diagramId: string }) => d.diagramId === diagramData.diagramId);
+          const draft = { diagramId: diagramData.diagramId, name: diagramData.name, createdAt: new Date().toISOString(), xml: xmlRef.current };
+          if (idx >= 0) drafts[idx] = draft; else drafts.unshift(draft);
+          if (drafts.length > 20) drafts.pop();
+          localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
+        } catch { /* ignore */ }
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [diagramData]);
 
   // --- Version restore handler ---
   const handleVersionRestore = React.useCallback(() => {

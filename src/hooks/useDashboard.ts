@@ -63,7 +63,6 @@ export function useDashboard(): UseDashboardReturn {
 
       if (!response.ok) {
         if (response.status === 401) {
-          // User not authenticated - show empty state
           setRecentDiagrams([]);
           setStats({ totalDiagrams: 0, totalGenerations: 0 });
           return;
@@ -72,9 +71,50 @@ export function useDashboard(): UseDashboardReturn {
       }
 
       const data = await response.json();
-      setRecentDiagrams(data.recentDiagrams ?? []);
-      setStats(data.stats ?? { totalDiagrams: 0, totalGenerations: 0 });
+      let diagrams: RecentDiagram[] = data.recentDiagrams ?? [];
+
+      // Merge with localStorage drafts (for diagrams not yet in DynamoDB)
+      if (typeof window !== 'undefined') {
+        try {
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; spec?: { services?: unknown[] } }>;
+          const existingIds = new Set(diagrams.map(d => d.diagramId));
+          for (const draft of drafts) {
+            if (!existingIds.has(draft.diagramId)) {
+              diagrams.push({
+                diagramId: draft.diagramId,
+                name: draft.name || 'Untitled',
+                updatedAt: draft.createdAt,
+                serviceCount: (draft.spec?.services as unknown[])?.length || 0,
+                status: 'draft',
+              });
+            }
+          }
+        } catch { /* ignore localStorage errors */ }
+      }
+
+      setRecentDiagrams(diagrams);
+      setStats({
+        totalDiagrams: diagrams.length,
+        totalGenerations: data.stats?.totalGenerations ?? diagrams.length,
+      });
     } catch (err) {
+      // If API fails, still show localStorage drafts
+      if (typeof window !== 'undefined') {
+        try {
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; spec?: { services?: unknown[] } }>;
+          const diagrams = drafts.map(d => ({
+            diagramId: d.diagramId,
+            name: d.name || 'Untitled',
+            updatedAt: d.createdAt,
+            serviceCount: (d.spec?.services as unknown[])?.length || 0,
+            status: 'draft',
+          }));
+          setRecentDiagrams(diagrams);
+          setStats({ totalDiagrams: diagrams.length, totalGenerations: diagrams.length });
+          setIsLoading(false);
+          return;
+        } catch { /* ignore */ }
+      }
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       setRecentDiagrams([]);
       setStats({ totalDiagrams: 0, totalGenerations: 0 });

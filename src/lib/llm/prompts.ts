@@ -24,7 +24,8 @@ export const ARCHITECTURE_SYSTEM_PROMPT = `You are an AWS Solutions Architect as
       "type": "string (AWS service type from supported list)",
       "label": "string (display label for the node)",
       "properties": { "key": "value" },
-      "groupId": "string (optional, references a group ID)"
+      "groupId": "string (optional, references a group ID)",
+      "position": { "x": "number (horizontal position 0-1200)", "y": "number (vertical position 0-800)" }
     }
   ],
   "connections": [
@@ -69,7 +70,14 @@ ec2, lambda, ecs, eks, fargate, elastic-beanstalk, lightsail, batch, outposts, a
 7. The "metadata.prompt" field must contain the exact user prompt.
 8. The "metadata.generatedAt" field must be a valid ISO 8601 timestamp.
 9. Every service referenced in a connection (sourceId/targetId) must exist in the services array.
-10. Every service referenced in a group's children array must exist in the services array.`;
+10. Every service referenced in a group's children array must exist in the services array.
+11. IMPORTANT - Position services in a logical LEFT-TO-RIGHT flow layout:
+    - User-facing services (CloudFront, Route53, ALB) on the LEFT (x: 50-200)
+    - Application layer (Lambda, ECS, API Gateway) in the MIDDLE (x: 300-600)
+    - Data layer (RDS, DynamoDB, S3) on the RIGHT (x: 700-1000)
+    - Security/monitoring services (WAF, CloudWatch, IAM) ABOVE or BELOW the main flow
+    - Space services vertically with y increments of 120-150px
+    - Main flow should be on a horizontal line (same y value ~300-400)`;
 
 /**
  * Builds the complete messages array for an architecture generation request.
