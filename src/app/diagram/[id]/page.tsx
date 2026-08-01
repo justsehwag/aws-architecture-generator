@@ -112,6 +112,7 @@ export default function DiagramViewerPage() {
   // --- State ---
   const [diagramData, setDiagramData] = React.useState<DiagramData | null>(null);
   const [cachedExplanation, setCachedExplanation] = React.useState<unknown>(null);
+  const [isFromCache, setIsFromCache] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
@@ -154,6 +155,7 @@ export default function DiagramViewerPage() {
           if (cachedData.explanation) {
             setCachedExplanation(cachedData.explanation);
           }
+          setIsFromCache(true);
           setIsLoading(false);
           return;
         }
@@ -187,11 +189,11 @@ export default function DiagramViewerPage() {
     fetchDiagram();
   }, [diagramId, router]);
 
-  // --- Autosave integration (Requirement 10.1) ---
+  // --- Autosave integration (Requirement 10.1) --- disabled for cached diagrams
   const { status: autosaveStatus, lastSavedAt, showWarning } = useAutosave({
     diagramId: diagramData?.diagramId ?? null,
     getContent: () => xmlRef.current || null,
-    enabled: !!diagramData,
+    enabled: !!diagramData && !isFromCache,
   });
 
   // --- Version restore handler ---
