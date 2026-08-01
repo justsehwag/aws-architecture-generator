@@ -102,7 +102,15 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
                 </Link>
                 <Link
                   href="/auth/login"
-                  onClick={() => setUserMenuOpen(false)}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    setUserMenuOpen(false);
+                    try {
+                      const { signOut } = await import('aws-amplify/auth');
+                      await signOut();
+                    } catch {}
+                    window.location.href = '/auth/login';
+                  }}
                   className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-accent"
                 >
                   <LogOut className="h-4 w-4" /> {isAuthenticated ? 'Sign Out' : 'Sign In'}
