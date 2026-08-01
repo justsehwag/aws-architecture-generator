@@ -1,5 +1,5 @@
 /**
- * LLM Client abstraction supporting OpenAI and Anthropic providers.
+ * LLM Client abstraction supporting OpenAI, Anthropic, and Amazon Bedrock providers.
  *
  * Features:
  * - 30-second timeout per request
@@ -17,6 +17,71 @@ import {
   LLMAPIError,
   getLLMConfig,
 } from './types';
+
+/**
+ * Makes a single Bedrock API call using AWS SDK.
+ */
+async function callBedrock(
+  config: LLMConfig,
+  messages: LLMMessage[]
+): Promise<LLMResponse> {
+  const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+
+  const client = new BedrockRuntimeClient({
+    region: process.env.AWS_REGION || 'ap-south-2',
+  });
+
+  // Separate system message from conversation
+  const systemMessage = messages.find((m) => m.role === 'system');
+  const conversationMessages = messages
+    .filter((m) => m.role !== 'system')
+    .map((m) => ({ role: m.role, content: m.content }));
+
+  const body = JSON.stringify({
+    anthropic_version: 'bedrock-2023-05-31',
+    max_tokens: 4096,
+    temperature: 0.3,
+    system: systemMessage?.content || '',
+    messages: conversationMessages,
+  });
+
+  try {
+    const command = new InvokeModelCommand({
+      modelId: config.model,
+      contentType: 'application/json',
+      accept: 'application/json',
+      body: new TextEncoder().encode(body),
+    });
+
+    const response = await client.send(command);
+    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+
+    const content = responseBody.content?.[0]?.text;
+    if (!content) {
+      throw new LLMAPIError('Bedrock returned empty response');
+    }
+
+    return {
+      content,
+      model: config.model,
+      usage: responseBody.usage
+        ? {
+            promptTokens: responseBody.usage.input_tokens || 0,
+            completionTokens: responseBody.usage.output_tokens || 0,
+            totalTokens: (responseBody.usage.input_tokens || 0) + (responseBody.usage.output_tokens || 0),
+          }
+        : undefined,
+    };
+  } catch (error) {
+    if (error instanceof LLMAPIError) throw error;
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      throw new LLMTimeoutError(config.timeoutMs);
+    }
+    throw new LLMAPIError(
+      `Bedrock request failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
 
 /**
  * Makes a single LLM API call with timeout enforcement.
@@ -173,6 +238,9 @@ async function sendToLLM(
   config: LLMConfig,
   messages: LLMMessage[]
 ): Promise<LLMResponse> {
+  if (config.provider === 'bedrock') {
+    return callBedrock(config, messages);
+  }
   if (config.provider === 'anthropic') {
     return callAnthropic(config, messages);
   }

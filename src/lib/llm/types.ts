@@ -7,7 +7,7 @@
 /**
  * Supported LLM providers.
  */
-export type LLMProvider = 'openai' | 'anthropic';
+export type LLMProvider = 'openai' | 'anthropic' | 'bedrock';
 
 /**
  * Configuration for the LLM client.
@@ -87,12 +87,15 @@ export const DEFAULT_MAX_RETRIES = 2;
  * Returns the LLM configuration from environment variables.
  */
 export function getLLMConfig(): LLMConfig {
-  const provider = (process.env.LLM_PROVIDER || 'openai') as LLMProvider;
+  const provider = (process.env.LLM_PROVIDER || 'bedrock') as LLMProvider;
 
   let apiKey: string;
   let model: string;
 
-  if (provider === 'anthropic') {
+  if (provider === 'bedrock') {
+    apiKey = ''; // Bedrock uses IAM credentials, no API key needed
+    model = process.env.LLM_MODEL || 'anthropic.claude-sonnet-4-20250514-v1:0';
+  } else if (provider === 'anthropic') {
     apiKey = process.env.ANTHROPIC_API_KEY || '';
     model = process.env.LLM_MODEL || 'claude-sonnet-4-20250514';
   } else {
