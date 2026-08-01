@@ -87,10 +87,10 @@ export function DrawioEmbed({
       proto: "json",
       spin: "1",
       libraries: "1",
-      // Enable AWS shape libraries
-      clibs: "Uhttps://jgraph.github.io/drawio-libs/libs/aws4.xml",
+      // Load all AWS shape libraries
+      libs: "aws4",
       ui: "dark",
-      noSaveBtn: editable ? "0" : "1",
+      noSaveBtn: "1",
       noExitBtn: "1",
       saveAndExit: "0",
     });
