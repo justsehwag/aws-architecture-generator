@@ -46,7 +46,7 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
   const categoryColors: Record<string, { fill: string; stroke: string }> = {
     compute: { fill: '#ED7100', stroke: '#C25400' },
     storage: { fill: '#3F8624', stroke: '#2D6A1B' },
-    database: { fill: '#2E27AD', stroke: '#1F1B80' },
+    database: { fill: '#C925D1', stroke: '#9B1EA8' },
     networking: { fill: '#8C4FFF', stroke: '#6B3ACC' },
     security: { fill: '#DD344C', stroke: '#B22A3D' },
     integration: { fill: '#E7157B', stroke: '#B8115F' },
@@ -79,12 +79,20 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
     const cat = serviceCategory[svc.type] || 'general';
     const colors = categoryColors[cat] || categoryColors.general;
     const escapedLabel = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${svc.type.replace(/-/g, '_')}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="48" height="48" as="geometry"/></mxCell>`;
+    // Map service types to correct Draw.io resIcon names
+    const iconMap: Record<string, string> = {
+      'api-gateway': 'api_gateway', 'nat-gateway': 'vpc_nat_gateway', 'route53': 'route_53',
+      'step-functions': 'step_functions', 'elastic-beanstalk': 'elastic_beanstalk',
+      'secrets-manager': 'secrets_manager', 'certificate-manager': 'certificate_manager',
+      'security-group': 'security_group', 'app-runner': 'app_runner',
+    };
+    const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
+    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${colors.fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="48" height="48" as="geometry"/></mxCell>`;
   });
 
   connections.forEach((conn) => {
     const escapedLabel = (conn.label || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    cells += `<mxCell id="${conn.id}" value="${escapedLabel}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#232F3E;fontSize=10;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
+    cells += `<mxCell id="${conn.id}" value="${escapedLabel}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#FFFFFF;fontSize=10;fontColor=#FFFFFF;labelBackgroundColor=none;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
   });
 
   return `<?xml version="1.0" encoding="UTF-8"?><mxfile><diagram name="Architecture"><mxGraphModel><root>${cells}</root></mxGraphModel></diagram></mxfile>`;
