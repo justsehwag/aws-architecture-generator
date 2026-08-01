@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Architecture Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 600px; text-align: center; padding: 2rem; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { color: #94a3b8; margin-bottom: 2rem; line-height: 1.6; }
+        .status { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .status h2 { color: #22c55e; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .info { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1rem; text-align: left; font-family: monospace; font-size: 0.85rem; }
+        .info div { padding: 0.25rem 0; }
+        .label { color: #64748b; }
+        .value { color: #3b82f6; }
+        a { color: #3b82f6; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AWS Architecture Generator</h1>
+        <p>Convert natural language descriptions into professional AWS architecture diagrams using AI and Draw.io MCP.</p>
+        
+        <div class="status">
+            <h2>✅ Infrastructure Deployed</h2>
+            <p style="color:#94a3b8;font-size:0.9rem;">All AWS resources are active in ap-south-2 (Hyderabad)</p>
+        </div>
+        
+        <div class="info">
+            <div><span class="label">Region:</span> <span class="value">ap-south-2 (Hyderabad)</span></div>
+            <div><span class="label">API:</span> <span class="value"><a href="https://kabcjmx4h3.execute-api.ap-south-2.amazonaws.com">kabcjmx4h3.execute-api.ap-south-2.amazonaws.com</a></span></div>
+            <div><span class="label">Auth:</span> <span class="value">Cognito (ap-south-2_793SO2BAF)</span></div>
+            <div><span class="label">Services:</span> <span class="value">CloudFront, S3, API GW, 7 Lambdas, 3 DynamoDB, Cognito</span></div>
+        </div>
+        
+        <p style="margin-top:2rem;font-size:0.85rem;color:#64748b;">
+            To use the full application, run <code style="background:#1e293b;padding:2px 6px;border-radius:4px;">npm run dev</code> locally.<br>
+            The API Gateway backend is live and accepting requests.
+        </p>
+    </div>
+</body>
+</html>

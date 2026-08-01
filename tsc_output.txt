@@ -1,0 +1,7 @@
+src/lib/explanation/explanation-generator.test.ts(248,37): error TS2322: Type '{ id: string; type: string; label: string; properties: {}; }[]' is not assignable to type 'ServiceNode[]'.
+  Type '{ id: string; type: string; label: string; properties: {}; }' is not assignable to type 'ServiceNode'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'AWSServiceType'.
+src/lib/explanation/explanation-generator.ts(69,14): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/explanation/explanation-generator.ts(102,38): error TS2802: Type 'Map<string, ServiceNode[]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/lib/explanation/explanation-generator.ts(104,13): error TS7006: Parameter 's' implicitly has an 'any' type.

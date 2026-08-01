@@ -1,0 +1,2401 @@
+{
+ "Description": "AWS Architecture Generator - Serverless deployment infrastructure",
+ "Resources": {
+  "ArchGeneratorUserPoolD482F8D1": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": false,
+      "RequireUppercase": true
+     }
+    },
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "arch-generator-users",
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorUserPool/Resource"
+   }
+  },
+  "ArchGeneratorUserPoolClientD8E9B6F2": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AccessTokenValidity": 60,
+    "AllowedOAuthFlows": [
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "openid",
+     "email",
+     "profile"
+    ],
+    "CallbackURLs": [
+     "http://localhost:3000/auth/callback",
+     "https://app.example.com/auth/callback"
+    ],
+    "ClientName": "arch-generator-web-client",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "IdTokenValidity": 60,
+    "LogoutURLs": [
+     "http://localhost:3000",
+     "https://app.example.com"
+    ],
+    "PreventUserExistenceErrors": "ENABLED",
+    "RefreshTokenValidity": 43200,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "TokenValidityUnits": {
+     "AccessToken": "minutes",
+     "IdToken": "minutes",
+     "RefreshToken": "minutes"
+    },
+    "UserPoolId": {
+     "Ref": "ArchGeneratorUserPoolD482F8D1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorUserPoolClient/Resource"
+   }
+  },
+  "ArchGeneratorUserPoolDomain1A0A751B": {
+   "Type": "AWS::Cognito::UserPoolDomain",
+   "Properties": {
+    "Domain": "arch-gen-915233",
+    "UserPoolId": {
+     "Ref": "ArchGeneratorUserPoolD482F8D1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorUserPoolDomain/Resource"
+   }
+  },
+  "StaticAssetsBucketC3095769": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/StaticAssetsBucket/Resource"
+   }
+  },
+  "StaticAssetsBucketPolicy3DFC5B6F": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "StaticAssetsBucketC3095769"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:PutBucketPolicy",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "StaticAssetsBucketC3095769",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "StaticAssetsBucketC3095769",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "StaticAssetsOAICC303F9B",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "StaticAssetsBucketC3095769",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "StaticAssetsBucketC3095769",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "StaticAssetsOAICC303F9B",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "StaticAssetsBucketC3095769",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/StaticAssetsBucket/Policy/Resource"
+   }
+  },
+  "StaticAssetsBucketAutoDeleteObjectsCustomResource861F8E4C": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "StaticAssetsBucketC3095769"
+    }
+   },
+   "DependsOn": [
+    "StaticAssetsBucketPolicy3DFC5B6F"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/StaticAssetsBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs24.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "StaticAssetsBucketC3095769"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "DiagramFilesBucket5E458741": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "CorsConfiguration": {
+     "CorsRules": [
+      {
+       "AllowedHeaders": [
+        "*"
+       ],
+       "AllowedMethods": [
+        "GET",
+        "PUT",
+        "POST"
+       ],
+       "AllowedOrigins": [
+        "*"
+       ],
+       "MaxAge": 3600
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DiagramFilesBucket/Resource"
+   }
+  },
+  "StaticAssetsOAICC303F9B": {
+   "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+   "Properties": {
+    "CloudFrontOriginAccessIdentityConfig": {
+     "Comment": "OAI for arch-generator static assets"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/StaticAssetsOAI/Resource"
+   }
+  },
+  "ArchGeneratorDistributionA17BE4E1": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "CustomErrorResponses": [
+      {
+       "ErrorCachingMinTTL": 300,
+       "ErrorCode": 403,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      },
+      {
+       "ErrorCachingMinTTL": 300,
+       "ErrorCode": 404,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      }
+     ],
+     "DefaultCacheBehavior": {
+      "AllowedMethods": [
+       "GET",
+       "HEAD"
+      ],
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "Compress": true,
+      "TargetOriginId": "ArchGeneratorStackArchGeneratorDistributionOrigin16A6EE2AD",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "DefaultRootObject": "index.html",
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "DomainName": {
+        "Fn::GetAtt": [
+         "StaticAssetsBucketC3095769",
+         "RegionalDomainName"
+        ]
+       },
+       "Id": "ArchGeneratorStackArchGeneratorDistributionOrigin16A6EE2AD",
+       "S3OriginConfig": {
+        "OriginAccessIdentity": {
+         "Fn::Join": [
+          "",
+          [
+           "origin-access-identity/cloudfront/",
+           {
+            "Ref": "StaticAssetsOAICC303F9B"
+           }
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "PriceClass": "PriceClass_100"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorDistribution/Resource"
+   }
+  },
+  "DiagramsTable00CCDB5D": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "SK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "diagramId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "GSI1-DiagramId",
+      "KeySchema": [
+       {
+        "AttributeName": "diagramId",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "PK",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "SK",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TimeToLiveSpecification": {
+     "AttributeName": "TTL",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DiagramsTable/Resource"
+   }
+  },
+  "VersionsTable23B78FD4": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "SK",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "PK",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "SK",
+      "KeyType": "RANGE"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/VersionsTable/Resource"
+   }
+  },
+  "TemplatesTable3F253039": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "SK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "ownerId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "createdAt",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "GSI-UserTemplates",
+      "KeySchema": [
+       {
+        "AttributeName": "ownerId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "createdAt",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "PK",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "SK",
+      "KeyType": "RANGE"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/TemplatesTable/Resource"
+   }
+  },
+  "LambdaExecutionRoleD5C26073": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/LambdaExecutionRole/Resource"
+   }
+  },
+  "LambdaExecutionRoleDefaultPolicy6D69732F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DiagramsTable00CCDB5D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DiagramsTable00CCDB5D",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "VersionsTable23B78FD4",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "VersionsTable23B78FD4",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "TemplatesTable3F253039",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "TemplatesTable3F253039",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ],
+       "Sid": "DynamoDBAccess"
+      },
+      {
+       "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DiagramFilesBucket5E458741",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DiagramFilesBucket5E458741",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ],
+       "Sid": "S3DiagramFilesAccess"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "Roles": [
+     {
+      "Ref": "LambdaExecutionRoleD5C26073"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/LambdaExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "GenerateLambda921FA2E9": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "94364667bedec5eb25284f82cfd832e050de9580f7818905b2a139ade9b1a2e5.zip"
+    },
+    "Description": "Processes natural language prompts via LLM and produces architecture specs",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-generate",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/GenerateLambda/Resource",
+    "aws:asset:path": "asset.94364667bedec5eb25284f82cfd832e050de9580f7818905b2a139ade9b1a2e5",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "RenderLambdaE2D96199": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "5a2e4540327397b5a681c89b64a1a1706efe2a94cd9247e2d7e8281096feb3c4.zip"
+    },
+    "Description": "Converts architecture specs to Draw.io XML via MCP server",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-render",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/RenderLambda/Resource",
+    "aws:asset:path": "asset.5a2e4540327397b5a681c89b64a1a1706efe2a94cd9247e2d7e8281096feb3c4",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AnalysisLambda08502239": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "c1addf1657d74f35166a46f3a8d31cbc532b61a61d29cc19ca16768f7ddcb959.zip"
+    },
+    "Description": "Evaluates architectures against Well-Architected Framework",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-analysis",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/AnalysisLambda/Resource",
+    "aws:asset:path": "asset.c1addf1657d74f35166a46f3a8d31cbc532b61a61d29cc19ca16768f7ddcb959",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CostLambdaD40018F0": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "6108930e02a214d7d5716b88748c94810f49cb59cd06411b9755232cfb566202.zip"
+    },
+    "Description": "Calculates estimated monthly costs for architecture services",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-cost",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/CostLambda/Resource",
+    "aws:asset:path": "asset.6108930e02a214d7d5716b88748c94810f49cb59cd06411b9755232cfb566202",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ExportLambdaDBBFE402": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "cb72f9cddeded77fb0893c6e42456faa2b54dd3820b1c343487ce58a49bfe1dd.zip"
+    },
+    "Description": "Exports diagrams to PNG, SVG, PDF, JSON, Markdown formats",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-export",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ExportLambda/Resource",
+    "aws:asset:path": "asset.cb72f9cddeded77fb0893c6e42456faa2b54dd3820b1c343487ce58a49bfe1dd",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "IaCLambda81F2A8E8": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "cf5f1f3103a0fd59d0bfa9a0f8d65e412eb900039f65f905255cbf5b062d6282.zip"
+    },
+    "Description": "Generates Terraform, CDK, and CloudFormation code from diagrams",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-iac",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/IaCLambda/Resource",
+    "aws:asset:path": "asset.cf5f1f3103a0fd59d0bfa9a0f8d65e412eb900039f65f905255cbf5b062d6282",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ImportLambdaD97E0F1E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Key": "254baa64e4987f0b2c1bfd42dbd8906764210d2dc63c07f8ab4d068439cf6407.zip"
+    },
+    "Description": "Validates and imports .drawio files",
+    "Environment": {
+     "Variables": {
+      "DIAGRAMS_TABLE": {
+       "Ref": "DiagramsTable00CCDB5D"
+      },
+      "VERSIONS_TABLE": {
+       "Ref": "VersionsTable23B78FD4"
+      },
+      "TEMPLATES_TABLE": {
+       "Ref": "TemplatesTable3F253039"
+      },
+      "DIAGRAM_FILES_BUCKET": {
+       "Ref": "DiagramFilesBucket5E458741"
+      },
+      "USER_POOL_ID": {
+       "Ref": "ArchGeneratorUserPoolD482F8D1"
+      },
+      "REGION": {
+       "Ref": "AWS::Region"
+      }
+     }
+    },
+    "FunctionName": "arch-generator-import",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 29
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ImportLambda/Resource",
+    "aws:asset:path": "asset.254baa64e4987f0b2c1bfd42dbd8906764210d2dc63c07f8ab4d068439cf6407",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ArchGeneratorApiF5BC7FDE": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Authorization",
+      "Content-Type",
+      "X-Amz-Date",
+      "X-Api-Key"
+     ],
+     "AllowMethods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 3600
+    },
+    "Description": "AWS Architecture Generator HTTP API",
+    "Name": "arch-generator-api",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/Resource"
+   }
+  },
+  "ArchGeneratorApiDefaultStage3EA5ED0C": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AutoDeploy": true,
+    "DefaultRouteSettings": {
+     "ThrottlingBurstLimit": 1000,
+     "ThrottlingRateLimit": 1000
+    },
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/DefaultStage/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsgenerateGenerateIntegrationCA42BC42": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "GenerateLambda921FA2E9",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/GenerateIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsgenerateGenerateIntegrationPermissionCC6F8751": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GenerateLambda921FA2E9",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/generate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/GenerateIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsgenerateCC7A07E0": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/diagrams/generate",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiPOSTapidiagramsgenerateGenerateIntegrationCA42BC42"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/Resource"
+   }
+  },
+  "ArchGeneratorApiCognitoAuthorizerEAEE303F": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizerType": "JWT",
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ],
+    "JwtConfiguration": {
+     "Audience": [
+      {
+       "Ref": "ArchGeneratorUserPoolClientD8E9B6F2"
+      }
+     ],
+     "Issuer": {
+      "Fn::Join": [
+       "",
+       [
+        "https://cognito-idp.",
+        {
+         "Ref": "AWS::Region"
+        },
+        ".amazonaws.com/",
+        {
+         "Ref": "ArchGeneratorUserPoolD482F8D1"
+        }
+       ]
+      ]
+     }
+    },
+    "Name": "CognitoAuthorizer"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/CognitoAuthorizer/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsimportImportIntegration76DC1C01": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ImportLambdaD97E0F1E",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/ImportIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsimportImportIntegrationPermission4F427343": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ImportLambdaD97E0F1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/import"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/ImportIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsimport6DCA8F15": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/diagrams/import",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiPOSTapidiagramsimportImportIntegration76DC1C01"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/RenderIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidRenderIntegrationPermission88E0C04A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/RenderIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsid0F026C49": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "GET /api/diagrams/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/Resource"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidRenderIntegrationPermission550734A4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}/RenderIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsid035D00EB": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "PUT /api/diagrams/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}/Resource"
+   }
+  },
+  "ArchGeneratorApiDELETEapidiagramsidRenderIntegrationPermissionEA43422C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/DELETE--api--diagrams--{id}/RenderIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiDELETEapidiagramsid443AED89": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "DELETE /api/diagrams/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/DELETE--api--diagrams--{id}/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationB1CA3E2B": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/RenderVersionsIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationPermission7F80E815": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/versions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/RenderVersionsIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidversions8B66F9CC": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "GET /api/diagrams/{id}/versions",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationB1CA3E2B"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidversionsRenderVersionsIntegrationPermission1AEF3CA7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/versions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--versions/RenderVersionsIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidversions2D4C2031": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/diagrams/{id}/versions",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationB1CA3E2B"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--versions/Resource"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidversionsvidrestoreRenderRestoreIntegration6B2CD373": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/RenderRestoreIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidversionsvidrestoreRenderRestoreIntegrationPermission9C52989F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/versions/{vid}/restore"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/RenderRestoreIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidversionsvidrestore322FBA5E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "PUT /api/diagrams/{id}/versions/{vid}/restore",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiPUTapidiagramsidversionsvidrestoreRenderRestoreIntegration6B2CD373"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidexportExportIntegration306BCABE": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ExportLambdaDBBFE402",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/ExportIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidexportExportIntegrationPermission23E26FB2": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ExportLambdaDBBFE402",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/export"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/ExportIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidexportEE645CED": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/diagrams/{id}/export",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiPOSTapidiagramsidexportExportIntegration306BCABE"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidanalysisAnalysisIntegration924318F7": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "AnalysisLambda08502239",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/AnalysisIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidanalysisAnalysisIntegrationPermissionDCF71DFF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AnalysisLambda08502239",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/analysis"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/AnalysisIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidanalysis48C9A87E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "GET /api/diagrams/{id}/analysis",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidanalysisAnalysisIntegration924318F7"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidcostCostIntegrationA9639269": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "CostLambdaD40018F0",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/CostIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidcostCostIntegrationPermissionB4104E82": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CostLambdaD40018F0",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/cost"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/CostIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiGETapidiagramsidcost8C5348C8": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "GET /api/diagrams/{id}/cost",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidcostCostIntegrationA9639269"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/Resource"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidcostCostIntegrationPermission026D3140": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CostLambdaD40018F0",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/cost"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--cost/CostIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPUTapidiagramsidcost09DDA141": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "PUT /api/diagrams/{id}/cost",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapidiagramsidcostCostIntegrationA9639269"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--cost/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidiacIaCIntegration96B4D3B5": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "IaCLambda81F2A8E8",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/IaCIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidiacIaCIntegrationPermission53B8E6A1": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "IaCLambda81F2A8E8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/diagrams/{id}/iac"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/IaCIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapidiagramsidiac72AD43CE": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/diagrams/{id}/iac",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiPOSTapidiagramsidiacIaCIntegration96B4D3B5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapitemplatesTemplatesIntegrationAD97F94A": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/TemplatesIntegration/Resource"
+   }
+  },
+  "ArchGeneratorApiGETapitemplatesTemplatesIntegrationPermissionF6FB3B5D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/templates"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/TemplatesIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiGETapitemplatesEB86B182": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "GET /api/templates",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapitemplatesTemplatesIntegrationAD97F94A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/Resource"
+   }
+  },
+  "ArchGeneratorApiPOSTapitemplatesTemplatesIntegrationPermission3A866626": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RenderLambdaE2D96199",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-2:915233244358:",
+       {
+        "Ref": "ArchGeneratorApiF5BC7FDE"
+       },
+       "/*/*/api/templates"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--templates/TemplatesIntegration-Permission"
+   }
+  },
+  "ArchGeneratorApiPOSTapitemplates015DCBAA": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    "RouteKey": "POST /api/templates",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ArchGeneratorApiGETapitemplatesTemplatesIntegrationAD97F94A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--templates/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VRwY4aMQz9luUc0tUg7aG3WdCqewJBe6qqVSbjnRomCYodKI3y71WSAtOql578nv38bCeNbJ4W8vFBnWmu+8N8xE7GHSt9EOpMb1G7wSI7Gb8Q+I1zo1i+2xu+guWIYHla+p250pUzCu1UUDNJ0ELG56APUNor+hpnBn+gnX2cTffKC9FClhLJKm0DuxWMwLDu9qCZZumbqKWNG1Ff7q6V/4d3bdixYjBgp9bPiiAJPbrQv3tnWca1xwFtqzUQvfZgGbmMXmbNS9b8U7FCYo9dYHTldaY8if5ilXF9J+Nn1Y2QBQUkgcrIuHU1V+L92oqSGJXpeiXjS7D66j/FG/AGicokWrwpImCSbQ5CHXFQDGd1OTUyfmI+tkfMTTlkumM1lOEV5NTWBa7o1TIMXl0H/UXvujbwd+fxJ/hifWMpiWUgdmYL5ILX9cob/qO08e6EPfj8JaIsnzdCO4hp8zrwMXAS1vUg9/Th1DzJRj4+7Alx7oNlNCC3Nf4CopLIQxMDAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "DistributionDomainName": {
+   "Description": "CloudFront distribution domain name for the frontend",
+   "Value": {
+    "Fn::GetAtt": [
+     "ArchGeneratorDistributionA17BE4E1",
+     "DomainName"
+    ]
+   }
+  },
+  "ApiEndpoint": {
+   "Description": "HTTP API Gateway endpoint URL",
+   "Value": {
+    "Fn::GetAtt": [
+     "ArchGeneratorApiF5BC7FDE",
+     "ApiEndpoint"
+    ]
+   }
+  },
+  "UserPoolId": {
+   "Description": "Cognito User Pool ID",
+   "Value": {
+    "Ref": "ArchGeneratorUserPoolD482F8D1"
+   }
+  },
+  "UserPoolClientId": {
+   "Description": "Cognito User Pool Client ID",
+   "Value": {
+    "Ref": "ArchGeneratorUserPoolClientD8E9B6F2"
+   }
+  },
+  "DiagramFilesBucketName": {
+   "Description": "S3 bucket for diagram files",
+   "Value": {
+    "Ref": "DiagramFilesBucket5E458741"
+   }
+  },
+  "StaticAssetsBucketName": {
+   "Description": "S3 bucket for static frontend assets",
+   "Value": {
+    "Ref": "StaticAssetsBucketC3095769"
+   }
+  },
+  "DiagramsTableName": {
+   "Description": "DynamoDB table for diagram metadata",
+   "Value": {
+    "Ref": "DiagramsTable00CCDB5D"
+   }
+  },
+  "VersionsTableName": {
+   "Description": "DynamoDB table for diagram versions",
+   "Value": {
+    "Ref": "VersionsTable23B78FD4"
+   }
+  },
+  "TemplatesTableName": {
+   "Description": "DynamoDB table for templates",
+   "Value": {
+    "Ref": "TemplatesTable3F253039"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

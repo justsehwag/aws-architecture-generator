@@ -1,0 +1,1208 @@
+{
+  "/ArchGeneratorStack": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/ArchGeneratorStack/DistributionDomainName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionDomainName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ApiEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiEndpoint"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:456:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/UserPoolId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolId"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:461:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/UserPoolClientId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolClientId"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DiagramFilesBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DiagramFilesBucketName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:471:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/StaticAssetsBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "StaticAssetsBucketName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:476:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DiagramsTableName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DiagramsTableName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:481:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/VersionsTableName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VersionsTableName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:486:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/TemplatesTableName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "TemplatesTableName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:5)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorUserPool/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorUserPoolD482F8D1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new UserPool2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:21:22)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorUserPoolClient/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorUserPoolClientD8E9B6F2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new UserPoolClient2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:38:28)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorUserPoolDomain/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorUserPoolDomain1A0A751B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new UserPoolDomain2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:65:28)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/StaticAssetsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "StaticAssetsBucketC3095769"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:75:32)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketAutoDeleteObjects"
+      }
+    }
+  ],
+  "/ArchGeneratorStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DiagramFilesBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DiagramFilesBucket5E458741"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:84:32)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/StaticAssetsOAI/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "StaticAssetsOAICC303F9B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new OriginAccessIdentity2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:106:34)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorDistribution/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorDistributionA17BE4E1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Distribution2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:114:26)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DiagramsTable/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DiagramsTable00CCDB5D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Table2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:146:27)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/VersionsTable/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VersionsTable23B78FD4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Table2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:162:27)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/TemplatesTable/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "TemplatesTable3F253039"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Table2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:170:28)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/LambdaExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LambdaExecutionRoleD5C26073"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Role2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:189:33)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/GenerateLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "GenerateLambda921FA2E9"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:258:24)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/RenderLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RenderLambdaE2D96199"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:268:22)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/AnalysisLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AnalysisLambda08502239"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:278:24)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/CostLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CostLambdaD40018F0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:287:20)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ExportLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportLambdaDBBFE402"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:296:22)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/IaCLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "IaCLambda81F2A8E8"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:306:19)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ImportLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ImportLambdaD97E0F1E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:315:22)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiF5BC7FDE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new HttpApi2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:327:21)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/StaticAssetsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "StaticAssetsBucketPolicy3DFC5B6F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:75:32)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals..."
+      ]
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketPolicyStatements"
+      }
+    }
+  ],
+  "/ArchGeneratorStack/StaticAssetsBucket/AutoDeleteObjectsCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "StaticAssetsBucketAutoDeleteObjectsCustomResource861F8E4C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/LambdaExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LambdaExecutionRoleDefaultPolicy6D69732F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:197:25)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/DefaultStage/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiDefaultStage3EA5ED0C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new HttpApi2 in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:327:21)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/GenerateIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsgenerateGenerateIntegrationPermissionCC6F8751"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:368:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsgenerateCC7A07E0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:368:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/CognitoAuthorizer/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:368:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/ImportIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsimportImportIntegrationPermission4F427343"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:376:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsimport6DCA8F15"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:376:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/RenderIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidRenderIntegrationPermission88E0C04A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsid0F026C49"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}/RenderIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidRenderIntegrationPermission550734A4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsid035D00EB"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/DELETE--api--diagrams--{id}/RenderIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiDELETEapidiagramsidRenderIntegrationPermissionEA43422C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/DELETE--api--diagrams--{id}/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiDELETEapidiagramsid443AED89"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/RenderVersionsIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationPermission7F80E815"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:392:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidversions8B66F9CC"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:392:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--versions/RenderVersionsIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidversionsRenderVersionsIntegrationPermission1AEF3CA7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:392:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--versions/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidversions2D4C2031"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:392:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/RenderRestoreIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidversionsvidrestoreRenderRestoreIntegrationPermission9C52989F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:400:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidversionsvidrestore322FBA5E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:400:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/ExportIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidexportExportIntegrationPermission23E26FB2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:408:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidexportEE645CED"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:408:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/AnalysisIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidanalysisAnalysisIntegrationPermissionDCF71DFF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:416:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidanalysis48C9A87E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:416:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/CostIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidcostCostIntegrationPermissionB4104E82"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:424:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidcost8C5348C8"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:424:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--cost/CostIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidcostCostIntegrationPermission026D3140"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:424:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--cost/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidcost09DDA141"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:424:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/IaCIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidiacIaCIntegrationPermission53B8E6A1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:432:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidiac72AD43CE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:432:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/TemplatesIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapitemplatesTemplatesIntegrationPermissionF6FB3B5D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:440:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapitemplatesEB86B182"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:440:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--templates/TemplatesIntegration-Permission": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapitemplatesTemplatesIntegrationPermission3A866626"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:440:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--templates/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapitemplates015DCBAA"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:440:13)",
+        "<anonymous> (c:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/GenerateIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsgenerateGenerateIntegrationCA42BC42"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:368:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/ImportIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsimportImportIntegration76DC1C01"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:376:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}/RenderIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:384:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--versions/RenderVersionsIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidversionsRenderVersionsIntegrationB1CA3E2B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:392:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/PUT--api--diagrams--{id}--versions--{vid}--restore/RenderRestoreIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPUTapidiagramsidversionsvidrestoreRenderRestoreIntegration6B2CD373"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:400:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--export/ExportIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidexportExportIntegration306BCABE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:408:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--analysis/AnalysisIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidanalysisAnalysisIntegration924318F7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:416:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--diagrams--{id}--cost/CostIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapidiagramsidcostCostIntegrationA9639269"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:424:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--{id}--iac/IaCIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiPOSTapidiagramsidiacIaCIntegration96B4D3B5"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:432:13)"
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/ArchGeneratorApi/GET--api--templates/TemplatesIntegration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ArchGeneratorApiGETapitemplatesTemplatesIntegrationAD97F94A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...c:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
+        "Array.map (:)",
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new ArchGeneratorStack (c:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:440:13)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+dist/
+.env.local
+.env*.local
+deploy.zip
+infrastructure/node_modules/
+infrastructure/dist/
+*.log
+.DS_Store

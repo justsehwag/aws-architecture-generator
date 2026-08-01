@@ -1,0 +1,92 @@
+/**
+ * Accessibility Styles
+ * 
+ * Focus-visible indicators with 3:1 minimum contrast ratio against adjacent colors.
+ * Ensures WCAG 2.1 Level AA compliance for keyboard navigation.
+ */
+
+@layer base {
+  /* 
+   * Global focus-visible styles for all interactive elements.
+   * Uses a 2px ring with offset for clear visibility against any background.
+   * The ring color (--ring) is set to ensure 3:1 contrast in both light and dark themes.
+   */
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring));
+    border-radius: var(--radius);
+  }
+
+  /* Remove default focus outline since we use box-shadow-based ring */
+  :focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* 
+   * Enhanced focus indicator for links within navigation.
+   * Rounded to match the link's own border-radius.
+   */
+  nav a:focus-visible,
+  nav button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring));
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  /*
+   * Skip link: visually hidden until focused.
+   * Appears at top-left when user tabs into it.
+   */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 9999;
+    padding: 0.75rem 1.5rem;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-radius: 0 0 var(--radius) 0;
+    transition: top 0.15s ease-in-out;
+  }
+
+  .skip-link:focus {
+    top: 0;
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring));
+  }
+
+  /*
+   * Ensure reduced motion is respected for focus transitions.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link {
+      transition: none;
+    }
+
+    :focus-visible {
+      transition: none;
+    }
+  }
+
+  /*
+   * High contrast mode support.
+   * When forced-colors are active, ensure focus indicators remain visible.
+   */
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline: 2px solid CanvasText;
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+  }
+}
