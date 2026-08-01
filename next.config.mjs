@@ -13,6 +13,11 @@ const nextConfig = {
   serverExternalPackages: ['@aws-sdk/client-bedrock-runtime'],
   experimental: {
     serverComponentsExternalPackages: ['@aws-sdk/client-bedrock-runtime'],
+    proxyTimeout: 300000,
+  },
+  // Increase serverless function timeout for API routes
+  serverRuntimeConfig: {
+    maxDuration: 300,
   },
 };
 

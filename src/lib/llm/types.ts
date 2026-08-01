@@ -77,8 +77,8 @@ export class LLMAPIError extends Error {
   }
 }
 
-/** Default timeout of 60 seconds per request. */
-export const DEFAULT_TIMEOUT_MS = 60_000;
+/** Default timeout of 300 seconds (5 minutes) per request — effectively no timeout. */
+export const DEFAULT_TIMEOUT_MS = 300_000;
 
 /** Maximum retry attempts on timeout (2 retries = 3 total attempts). */
 export const DEFAULT_MAX_RETRIES = 2;

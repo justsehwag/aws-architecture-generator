@@ -10,6 +10,9 @@
  * Validates: Requirements 1.1, 1.2, 1.4, 1.6
  */
 
+// Max execution time for this route (5 minutes)
+export const maxDuration = 300;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { callLLMWithRetry } from '@/lib/llm/client';
