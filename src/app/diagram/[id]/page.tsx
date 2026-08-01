@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DiagramProvider } from "@/components/diagram/DiagramContext";
-import { DiagramCanvas } from "@/components/diagram/DiagramCanvas";
+import { DrawioEmbed } from "@/components/diagram/DrawioEmbed";
 import { AnalysisPanel } from "@/components/analysis/AnalysisPanel";
 import { CostPanel } from "@/components/cost/CostPanel";
 import { ExplanationPanel } from "@/components/explanation/ExplanationPanel";
@@ -79,7 +79,7 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
     const cat = serviceCategory[svc.type] || 'general';
     const colors = categoryColors[cat] || categoryColors.general;
     const escapedLabel = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=${colors.fill};fontColor=#ffffff;strokeColor=${colors.stroke};fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="150" height="60" as="geometry"/></mxCell>`;
+    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${svc.type.replace(/-/g, '_')}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="48" height="48" as="geometry"/></mxCell>`;
   });
 
   connections.forEach((conn) => {
@@ -321,9 +321,17 @@ export default function DiagramViewerPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Diagram canvas — takes remaining width */}
         <main className="flex-1 overflow-hidden">
-          <DiagramProvider initialXml={diagramData.drawioXml}>
-            <DiagramCanvas className="h-full w-full" />
-          </DiagramProvider>
+          {diagramData.drawioXml ? (
+            <DrawioEmbed
+              xml={diagramData.drawioXml}
+              className="h-full w-full"
+              onXmlChange={(newXml) => { xmlRef.current = newXml; }}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <p className="text-muted-foreground">No diagram content</p>
+            </div>
+          )}
         </main>
 
         {/* Right side panel */}
