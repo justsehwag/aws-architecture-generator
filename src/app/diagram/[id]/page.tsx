@@ -323,7 +323,11 @@ export default function DiagramViewerPage() {
         {chatOpen && (
           <aside className="w-80 flex-shrink-0 lg:w-96">
             <DiagramChat
-              diagramXml={diagramData.drawioXml}
+              architectureSpec={(() => { try { const c = sessionStorage.getItem(`diagram_${diagramId}`); return c ? JSON.parse(c).architectureSpec : null; } catch { return null; } })()}
+              onArchitectureUpdate={(_spec, xml) => {
+                setDiagramData(prev => prev ? { ...prev, drawioXml: xml } : prev);
+                xmlRef.current = xml;
+              }}
               className="h-full"
             />
           </aside>
