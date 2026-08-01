@@ -109,9 +109,9 @@ const awsServiceTypeSchema = z.enum([
  */
 const serviceNodeSchema = z.object({
   id: z.string().min(1),
-  type: awsServiceTypeSchema,
+  type: z.string().min(1), // Accept any string, don't restrict to enum
   label: z.string().min(1),
-  properties: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]).transform(String)).default({}),
+  properties: z.record(z.string(), z.any()).default({}),
   groupId: z.string().optional(),
   position: z
     .object({
@@ -130,8 +130,8 @@ const connectionSchema = z.object({
   targetId: z.string().min(1),
   label: z.string().optional(),
   protocol: z.string().optional(),
-  port: z.number().int().positive().optional(),
-  bidirectional: z.boolean().optional(),
+  port: z.any().optional(),
+  bidirectional: z.any().optional(),
 });
 
 /**
@@ -155,25 +155,26 @@ const resourceGroupSchema = z.object({
  * Schema for architecture metadata.
  */
 const architectureMetadataSchema = z.object({
-  prompt: z.string().min(1),
-  generatedAt: z.string().min(1),
-  llmModel: z.string().min(1),
+  prompt: z.string().optional(),
+  generatedAt: z.string().optional(),
+  llmModel: z.string().optional(),
   templateId: z.string().optional(),
-});
+}).passthrough();
 
 /**
  * Complete ArchitectureSpec Zod schema for validating LLM output.
+ * Lenient: accepts any reasonable JSON structure with services.
  */
 export const architectureSpecSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  description: z.string().min(1),
-  region: z.string().min(1),
+  description: z.string().default(''),
+  region: z.string().default('us-east-1'),
   services: z.array(serviceNodeSchema).min(1),
-  connections: z.array(connectionSchema),
-  groups: z.array(resourceGroupSchema),
-  metadata: architectureMetadataSchema,
-});
+  connections: z.array(connectionSchema).default([]),
+  groups: z.array(resourceGroupSchema).default([]),
+  metadata: architectureMetadataSchema.optional(),
+}).passthrough();
 
 /**
  * Result of validating an LLM response.
