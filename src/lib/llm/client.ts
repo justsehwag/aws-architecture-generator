@@ -18,6 +18,9 @@ import {
   getLLMConfig,
 } from './types';
 
+// Static import so Next.js bundler includes the Bedrock SDK
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+
 /**
  * Makes a single Bedrock API call using direct fetch with AWS Signature V4.
  * Falls back to the Anthropic direct API if AWS credentials are not available.
@@ -54,8 +57,6 @@ async function callBedrock(
   });
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
     const client = new BedrockRuntimeClient({ region });
     const command = new InvokeModelCommand({
       modelId,
