@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { TopNav } from "./TopNav";
 import { Sidebar } from "./Sidebar";
 import { SkipLink } from "@/components/ui/skip-link";
@@ -11,6 +12,18 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const pathname = usePathname();
+
+  // Hide navigation on diagram viewer pages (full-screen editing)
+  const isDiagramPage = pathname?.startsWith("/diagram/");
+
+  if (isDiagramPage) {
+    return (
+      <div className="h-screen bg-background overflow-hidden">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

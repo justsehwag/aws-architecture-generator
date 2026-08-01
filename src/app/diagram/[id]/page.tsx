@@ -10,15 +10,15 @@ import {
   BarChart3,
   Shield,
   BookOpen,
+  MessageSquare,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DiagramProvider } from "@/components/diagram/DiagramContext";
 import { DrawioEmbed } from "@/components/diagram/DrawioEmbed";
-import { AnalysisPanel } from "@/components/analysis/AnalysisPanel";
-import { CostPanel } from "@/components/cost/CostPanel";
+import { DiagramChat } from "@/components/diagram/DiagramChat";
 import { ExplanationPanel } from "@/components/explanation/ExplanationPanel";
 import { ExportDialog } from "@/components/export/ExportDialog";
-import { VersionHistory } from "@/components/version/VersionHistory";
 import { useAutosave } from "@/hooks/useAutosave";
 import { cn } from "@/lib/utils";
 
@@ -115,8 +115,7 @@ export default function DiagramViewerPage() {
   const [isFromCache, setIsFromCache] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<RightPanelTab>("analysis");
+  const [chatOpen, setChatOpen] = React.useState(true);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
   // Track current XML for autosave
@@ -220,13 +219,7 @@ export default function DiagramViewerPage() {
       });
   }, [diagramId]);
 
-  // --- Tab configuration ---
-  const tabs: { id: RightPanelTab; label: string; icon: React.ReactNode }[] = [
-    { id: "analysis", label: "Analysis", icon: <Shield className="h-4 w-4" aria-hidden="true" /> },
-    { id: "cost", label: "Cost", icon: <BarChart3 className="h-4 w-4" aria-hidden="true" /> },
-    { id: "explanation", label: "Explanation", icon: <BookOpen className="h-4 w-4" aria-hidden="true" /> },
-    { id: "versions", label: "Versions", icon: <History className="h-4 w-4" aria-hidden="true" /> },
-  ];
+  // (Tabs removed — chatbot replaces side panels)
 
   // --- Loading state ---
   if (isLoading) {
@@ -273,46 +266,30 @@ export default function DiagramViewerPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Top toolbar */}
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Top toolbar — minimal */}
       <header className="flex items-center justify-between border-b border-border bg-background px-4 py-2">
         <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/create")} aria-label="Back">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <h1 className="truncate text-sm font-semibold text-foreground">
             {diagramData.name}
           </h1>
-          {/* Autosave status indicator */}
-          <AutosaveIndicator
-            status={autosaveStatus}
-            lastSavedAt={lastSavedAt}
-            showWarning={showWarning}
-          />
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Export button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setExportDialogOpen(true)}
-            aria-label="Export diagram"
-          >
+          <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)} aria-label="Export diagram">
             <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
             Export
           </Button>
-
-          {/* Toggle right panel */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setRightPanelOpen(!rightPanelOpen)}
-            aria-label={rightPanelOpen ? "Close side panel" : "Open side panel"}
-            aria-expanded={rightPanelOpen}
+            onClick={() => setChatOpen(!chatOpen)}
+            aria-label={chatOpen ? "Close chat" : "Open chat"}
           >
-            {rightPanelOpen ? (
-              <PanelRightClose className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
-            )}
+            <MessageSquare className="h-4 w-4" />
           </Button>
         </div>
       </header>
@@ -334,119 +311,13 @@ export default function DiagramViewerPage() {
           )}
         </main>
 
-        {/* Right side panel */}
-        {rightPanelOpen && (
-          <aside
-            className="flex w-80 flex-shrink-0 flex-col border-l border-border bg-background lg:w-96"
-            aria-label="Side panel"
-          >
-            {/* Tab navigation */}
-            <nav
-              className="flex border-b border-border"
-              role="tablist"
-              aria-label="Panel tabs"
-            >
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  id={`panel-tab-${tab.id}`}
-                  aria-selected={activeTab === tab.id}
-                  aria-controls={`panel-tabpanel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "flex flex-1 items-center justify-center gap-1.5 px-2 py-2.5 text-xs font-medium transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-                    activeTab === tab.id
-                      ? "border-b-2 border-primary text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {tab.icon}
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              ))}
-            </nav>
-
-            {/* Tab panels */}
-            <div className="flex-1 overflow-y-auto">
-              <div
-                role="tabpanel"
-                id="panel-tabpanel-analysis"
-                aria-labelledby="panel-tab-analysis"
-                hidden={activeTab !== "analysis"}
-                className="h-full"
-              >
-                {activeTab === "analysis" && !isFromCache && (
-                  <AnalysisPanel
-                    diagramId={diagramData.diagramId}
-                    className="border-l-0"
-                  />
-                )}
-                {activeTab === "analysis" && isFromCache && (
-                  <div className="p-4 text-sm text-muted-foreground">
-                    <h3 className="font-semibold text-foreground mb-2">Architecture Analysis</h3>
-                    <p>Analysis is computed from the generated architecture. Save the diagram to enable full Well-Architected analysis.</p>
-                  </div>
-                )}
-              </div>
-
-              <div
-                role="tabpanel"
-                id="panel-tabpanel-cost"
-                aria-labelledby="panel-tab-cost"
-                hidden={activeTab !== "cost"}
-                className="h-full p-4"
-              >
-                {activeTab === "cost" && !isFromCache && (
-                  <CostPanel diagramId={diagramData.diagramId} />
-                )}
-                {activeTab === "cost" && isFromCache && (
-                  <div className="text-sm text-muted-foreground">
-                    <h3 className="font-semibold text-foreground mb-2">Cost Estimation</h3>
-                    <p>Save the diagram to enable cost estimation.</p>
-                  </div>
-                )}
-              </div>
-
-              <div
-                role="tabpanel"
-                id="panel-tabpanel-explanation"
-                aria-labelledby="panel-tab-explanation"
-                hidden={activeTab !== "explanation"}
-                className="h-full"
-              >
-                {activeTab === "explanation" && (
-                  <ExplanationPanel
-                    diagramId={diagramData.diagramId}
-                    explanation={cachedExplanation as never}
-                    className="border-l-0"
-                  />
-                )}
-              </div>
-
-              <div
-                role="tabpanel"
-                id="panel-tabpanel-versions"
-                aria-labelledby="panel-tab-versions"
-                hidden={activeTab !== "versions"}
-                className="h-full p-4"
-              >
-                {activeTab === "versions" && !isFromCache && (
-                  <VersionHistory
-                    diagramId={diagramData.diagramId}
-                    onRestoreSuccess={handleVersionRestore}
-                  />
-                )}
-                {activeTab === "versions" && isFromCache && (
-                  <div className="text-sm text-muted-foreground">
-                    <h3 className="font-semibold text-foreground mb-2">Version History</h3>
-                    <p>Save the diagram to enable version history.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* Chat panel */}
+        {chatOpen && (
+          <aside className="w-80 flex-shrink-0 lg:w-96">
+            <DiagramChat
+              diagramXml={diagramData.drawioXml}
+              className="h-full"
+            />
           </aside>
         )}
       </div>
