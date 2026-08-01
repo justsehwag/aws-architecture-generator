@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
   const { prompt, templateId, preferences } = validation.data;
   const llmConfig = getLLMConfig();
 
-  // Check if API key is configured
-  if (!llmConfig.apiKey) {
+  // Check if API key is configured (not needed for Bedrock which uses IAM)
+  if (!llmConfig.apiKey && llmConfig.provider !== 'bedrock') {
     return NextResponse.json(
       {
         error: 'LLM service is not configured. Please set the API key in environment variables.',
