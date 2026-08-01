@@ -42,6 +42,45 @@ function hasAuthCookie(request: NextRequest): boolean {
   return false;
 }
 
+/**
+ * Extracts the user ID (sub claim) from Cognito JWT stored in cookies.
+ * Decodes the JWT payload without verification (middleware runs on edge).
+ */
+function extractUserIdFromCookies(request: NextRequest): string | null {
+  const cookies = request.cookies;
+  const allCookies = cookies.getAll();
+
+  // Find the idToken cookie
+  for (const cookie of allCookies) {
+    if (
+      cookie.name.includes('CognitoIdentityServiceProvider') &&
+      cookie.name.includes('idToken')
+    ) {
+      try {
+        // JWT is base64url encoded: header.payload.signature
+        const parts = cookie.value.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(
+            Buffer.from(parts[1], 'base64url').toString('utf-8')
+          );
+          return payload.sub || payload['cognito:username'] || null;
+        }
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  // Fallback: check lastAuthUser cookie
+  for (const cookie of allCookies) {
+    if (cookie.name.includes('LastAuthUser')) {
+      return cookie.value;
+    }
+  }
+
+  return null;
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -49,6 +88,21 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = PROTECTED_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
+
+  // For API routes, extract user ID from auth token and forward as header
+  if (pathname.startsWith('/api/')) {
+    const userId = extractUserIdFromCookies(request);
+    const response = NextResponse.next();
+    if (userId) {
+      // Clone the request headers and add x-user-id
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set('x-user-id', userId);
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      });
+    }
+    return response;
+  }
 
   if (!isProtectedRoute) {
     return NextResponse.next();
@@ -66,5 +120,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/create/:path*', '/diagram/:path*', '/templates/:path*'],
+  matcher: ['/create/:path*', '/diagram/:path*', '/templates/:path*', '/api/:path*'],
 };

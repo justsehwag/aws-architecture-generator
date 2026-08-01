@@ -196,11 +196,11 @@ export default function DiagramViewerPage() {
     fetchDiagram();
   }, [diagramId, router]);
 
-  // --- Autosave integration (Requirement 10.1) --- disabled for cached diagrams
+  // --- Autosave integration (Requirement 10.1)
   const { status: autosaveStatus, lastSavedAt, showWarning } = useAutosave({
     diagramId: diagramData?.diagramId ?? null,
     getContent: () => xmlRef.current || null,
-    enabled: !!diagramData && !isFromCache,
+    enabled: !!diagramData,
   });
 
   // --- Version restore handler ---
