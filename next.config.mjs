@@ -10,6 +10,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  serverExternalPackages: ['@aws-sdk/client-bedrock-runtime'],
+  experimental: {
+    serverComponentsExternalPackages: ['@aws-sdk/client-bedrock-runtime'],
+  },
 };
 
 export default nextConfig;
