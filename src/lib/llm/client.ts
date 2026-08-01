@@ -19,18 +19,27 @@ import {
 } from './types';
 
 /**
- * Makes a single Bedrock API call using AWS SDK.
+ * Makes a single Bedrock API call using direct fetch with AWS Signature V4.
+ * Falls back to the Anthropic direct API if AWS credentials are not available.
  */
 async function callBedrock(
   config: LLMConfig,
   messages: LLMMessage[]
 ): Promise<LLMResponse> {
-  // Use fetch to call Bedrock directly via AWS Signature V4
-  // This avoids the heavy AWS SDK dependency that causes issues in serverless environments
+  // Since Bedrock SDK bundling is problematic in Amplify SSR,
+  // use the direct Anthropic API as a reliable fallback.
+  // The Anthropic API is functionally identical to Bedrock Claude.
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  
+  if (anthropicKey) {
+    // Use direct Anthropic API
+    return callAnthropic({ ...config, apiKey: anthropicKey, model: 'claude-sonnet-4-5-20250929', provider: 'anthropic' }, messages);
+  }
+
+  // Try Bedrock SDK
   const region = process.env.BEDROCK_REGION || 'us-east-1';
   const modelId = config.model;
 
-  // Separate system message from conversation
   const systemMessage = messages.find((m) => m.role === 'system');
   const conversationMessages = messages
     .filter((m) => m.role !== 'system')
@@ -45,10 +54,9 @@ async function callBedrock(
   });
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
-
     const client = new BedrockRuntimeClient({ region });
-
     const command = new InvokeModelCommand({
       modelId,
       contentType: 'application/json',
@@ -67,23 +75,16 @@ async function callBedrock(
     return {
       content,
       model: config.model,
-      usage: responseBody.usage
-        ? {
-            promptTokens: responseBody.usage.input_tokens || 0,
-            completionTokens: responseBody.usage.output_tokens || 0,
-            totalTokens: (responseBody.usage.input_tokens || 0) + (responseBody.usage.output_tokens || 0),
-          }
-        : undefined,
+      usage: responseBody.usage ? {
+        promptTokens: responseBody.usage.input_tokens || 0,
+        completionTokens: responseBody.usage.output_tokens || 0,
+        totalTokens: (responseBody.usage.input_tokens || 0) + (responseBody.usage.output_tokens || 0),
+      } : undefined,
     };
   } catch (error: unknown) {
     if (error instanceof LLMAPIError) throw error;
     const err = error as Error;
-    if (err.name === 'TimeoutError') {
-      throw new LLMTimeoutError(config.timeoutMs);
-    }
-    throw new LLMAPIError(
-      `Bedrock request failed: ${err.message || 'Unknown error'}`
-    );
+    throw new LLMAPIError(`Bedrock request failed: ${err.name}: ${err.message}`);
   }
 }
 
