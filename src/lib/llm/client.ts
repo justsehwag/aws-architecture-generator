@@ -57,7 +57,14 @@ async function callBedrock(
   });
 
   try {
-    const client = new BedrockRuntimeClient({ region });
+    // Use explicit credentials from env if available (for Amplify SSR)
+    const clientConfig: Record<string, unknown> = { region };
+    const accessKeyId = process.env.BEDROCK_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.BEDROCK_SECRET_ACCESS_KEY;
+    if (accessKeyId && secretAccessKey) {
+      clientConfig.credentials = { accessKeyId, secretAccessKey };
+    }
+    const client = new BedrockRuntimeClient(clientConfig as { region: string; credentials?: { accessKeyId: string; secretAccessKey: string } });
     const command = new InvokeModelCommand({
       modelId,
       contentType: 'application/json',
