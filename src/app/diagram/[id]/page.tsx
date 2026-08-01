@@ -32,6 +32,32 @@ interface DiagramData {
   drawioXml: string;
 }
 
+/**
+ * Generates a basic Draw.io XML diagram from an ArchitectureSpec.
+ * Places services in a grid layout with connections.
+ */
+function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label: string; type: string }>; connections?: Array<{ id: string; sourceId: string; targetId: string; label?: string }> }): string {
+  const services = spec.services || [];
+  const connections = spec.connections || [];
+  const cols = Math.ceil(Math.sqrt(services.length));
+
+  let cells = '<mxCell id="0"/><mxCell id="1" parent="0"/>';
+  
+  services.forEach((svc, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = 80 + col * 200;
+    const y = 80 + row * 150;
+    cells += `<mxCell id="${svc.id}" value="${svc.label}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9900;fontColor=#ffffff;strokeColor=#232F3E;" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="140" height="60" as="geometry"/></mxCell>`;
+  });
+
+  connections.forEach((conn) => {
+    cells += `<mxCell id="${conn.id}" value="${conn.label || ''}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?><mxfile><diagram name="Architecture"><mxGraphModel><root>${cells}</root></mxGraphModel></diagram></mxfile>`;
+}
+
 // --- Component ---
 
 /**
@@ -78,12 +104,20 @@ export default function DiagramViewerPage() {
         const cached = sessionStorage.getItem(`diagram_${diagramId}`);
         if (cached) {
           const cachedData = JSON.parse(cached);
+          const spec = cachedData.architectureSpec;
+          
+          // Generate basic drawio XML from architecture spec if no XML present
+          let xml = cachedData.drawioXml || "";
+          if (!xml && spec?.services) {
+            xml = generateDrawioXmlFromSpec(spec);
+          }
+          
           setDiagramData({
             diagramId: cachedData.diagramId ?? diagramId,
-            name: cachedData.architectureSpec?.name ?? "Generated Diagram",
-            drawioXml: cachedData.drawioXml ?? "",
+            name: spec?.name ?? "Generated Diagram",
+            drawioXml: xml,
           });
-          xmlRef.current = cachedData.drawioXml ?? "";
+          xmlRef.current = xml;
           setIsLoading(false);
           return;
         }
