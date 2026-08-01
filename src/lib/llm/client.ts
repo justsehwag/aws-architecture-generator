@@ -28,7 +28,7 @@ async function callBedrock(
   const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
 
   const client = new BedrockRuntimeClient({
-    region: process.env.AWS_REGION || 'ap-south-2',
+    region: process.env.BEDROCK_REGION || 'us-east-1',
   });
 
   // Separate system message from conversation
