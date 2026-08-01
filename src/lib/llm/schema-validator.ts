@@ -111,7 +111,7 @@ const serviceNodeSchema = z.object({
   id: z.string().min(1),
   type: awsServiceTypeSchema,
   label: z.string().min(1),
-  properties: z.record(z.string(), z.string()).default({}),
+  properties: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]).transform(String)).default({}),
   groupId: z.string().optional(),
   position: z
     .object({
