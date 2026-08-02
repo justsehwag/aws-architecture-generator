@@ -1,15 +1,17 @@
 'use client';
 
-import React, { Suspense, useCallback, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, LayoutTemplate } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { PromptInput } from '@/components/create/PromptInput';
 import { GenerationProgress } from '@/components/create/GenerationProgress';
 import { GenerationError } from '@/components/create/GenerationError';
+import { ThemeToggle } from '@/components/create/ThemeToggle';
+import { PromptGenerator } from '@/components/create/PromptGenerator';
 import { useGenerationState } from '@/hooks/useGenerationState';
-import { useTemplates } from '@/hooks/useTemplates';
 import { useDrawioGenerator } from '@/hooks/useDrawioGenerator';
+import { useAuthGate } from '@/hooks/useAuthGate';
 import {
   createApiError,
   createParseError,
@@ -17,29 +19,27 @@ import {
   createNetworkError,
   type GenerationError as GenerationErrorData,
 } from '@/lib/errors/generation-errors';
-import { generateDiagram, ApiError } from '@/api';
+
+type CreateMode = 'manual' | 'generator';
 
 /**
  * Create Diagram page content.
  *
- * Integrates the PromptInput component with a template selector,
- * wires the generate button to POST /api/diagrams/generate,
+ * Integrates the PromptInput component with prompt generator mode,
+ * wires the generate button to the Lambda Function URL,
  * navigates to the Diagram Viewer on success, and shows
  * GenerationProgress during processing and GenerationError on failure.
  *
- * Supports `?template=<id>` query param for pre-selecting a template.
- *
- * Validates: Requirements 11.2
+ * Auth-gated: page is publicly viewable but generation actions require authentication.
  */
 function CreateDiagramContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const templateParam = searchParams.get('template');
 
   const { state, isProcessing, startGeneration, setStep, setReady, setError, reset } =
     useGenerationState();
 
-  const { templates, isLoading: templatesLoading, getTemplateById } = useTemplates();
+  const { guardAction, isAuthenticated } = useAuthGate();
 
   // New Draw.io Generator hook (Lambda Function URL - primary generation method)
   const {
@@ -52,25 +52,14 @@ function CreateDiagramContent() {
   } = useDrawioGenerator();
 
   const [generationError, setGenerationError] = React.useState<GenerationErrorData | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | null>(
-    templateParam
-  );
   const [lastPrompt, setLastPrompt] = React.useState<string>('');
   const [isRetrying, setIsRetrying] = React.useState(false);
-
-  // Pre-select template from query param
-  useEffect(() => {
-    if (templateParam) {
-      setSelectedTemplateId(templateParam);
-    }
-  }, [templateParam]);
-
-  const selectedTemplate = selectedTemplateId ? getTemplateById(selectedTemplateId) : null;
+  const [createMode, setCreateMode] = useState<CreateMode>('manual');
+  const [sharedPrompt, setSharedPrompt] = useState<string>('');
 
   // Watch for successful generation from the drawio generator hook
   useEffect(() => {
     if (drawioXml && drawioId) {
-      // Store in session storage for the diagram viewer page
       try {
         sessionStorage.setItem(`diagram_${drawioId}`, JSON.stringify({
           diagramId: drawioId,
@@ -123,48 +112,19 @@ function CreateDiagramContent() {
 
   /**
    * Handles the diagram generation flow.
-   * Uses the Lambda Function URL endpoint via useDrawioGenerator hook (primary method).
+   * Auth-gated: requires authentication.
    */
   const handleGenerate = useCallback(
-    async (prompt: string) => {
-      setLastPrompt(prompt);
-      setGenerationError(null);
-      resetDrawio();
-      startGeneration();
-
-      // Primary generation method: Lambda Function URL via useDrawioGenerator hook
-      await generateDrawio(prompt);
-
-      // Note: Success/error handling is done via useEffect watchers on drawioXml/drawioError
-      // The old /api/diagrams/generate route is kept below as a fallback reference:
-      // try {
-      //   const response = await fetch('/api/diagrams/generate', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify({ prompt }),
-      //   });
-      //   if (!response.ok) {
-      //     const body = await response.json().catch(() => ({})) as Record<string, unknown>;
-      //     const apiError = createApiError(response.status);
-      //     setError({ message: (body.error as string) || apiError.message });
-      //     setGenerationError(apiError);
-      //     return;
-      //   }
-      //   const data = await response.json();
-      //   setStep('generating-diagram');
-      //   setStep('analyzing');
-      //   setReady();
-      //   if (data.diagramId) {
-      //     try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
-      //     router.push(`/diagram/${data.diagramId}`);
-      //   }
-      // } catch {
-      //   const networkError = createNetworkError();
-      //   setError({ message: networkError.message });
-      //   setGenerationError(networkError);
-      // }
+    (prompt: string) => {
+      guardAction(async () => {
+        setLastPrompt(prompt);
+        setGenerationError(null);
+        resetDrawio();
+        startGeneration();
+        await generateDrawio(prompt);
+      });
     },
-    [startGeneration, generateDrawio, resetDrawio]
+    [guardAction, startGeneration, generateDrawio, resetDrawio]
   );
 
   /**
@@ -176,111 +136,94 @@ function CreateDiagramContent() {
     setGenerationError(null);
     reset();
     resetDrawio();
-    await handleGenerate(lastPrompt);
+    handleGenerate(lastPrompt);
     setIsRetrying(false);
   }, [lastPrompt, reset, resetDrawio, handleGenerate]);
+
+  /**
+   * When prompt generator produces a prompt, switch to manual mode
+   * and populate the shared prompt state.
+   */
+  const handlePromptGenerated = useCallback((prompt: string) => {
+    setSharedPrompt(prompt);
+    setCreateMode('manual');
+  }, []);
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Create Diagram
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          Describe your AWS architecture in plain English and generate a professional diagram.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Create Diagram
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Describe your AWS architecture in plain English and generate a professional diagram.
+          </p>
+        </div>
+        <ThemeToggle />
       </div>
 
-      {/* Template Selector Section */}
-      <section aria-labelledby="template-selector-heading">
-        <div className="flex items-center justify-between">
-          <h2
-            id="template-selector-heading"
-            className="text-lg font-semibold text-foreground"
-          >
-            Start from a template
-          </h2>
-          <Link
-            href="/templates"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Browse all templates
-            <ArrowRight className="h-3 w-3" aria-hidden="true" />
-          </Link>
-        </div>
+      {/* Templates link preserved */}
+      <div className="flex justify-end">
+        <Link
+          href="/templates"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Browse templates
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+        </Link>
+      </div>
 
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {templatesLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-20 animate-pulse rounded-lg border border-border bg-muted/50"
-                aria-hidden="true"
-              />
-            ))
-          ) : (
-            templates.slice(0, 6).map((template) => (
-              <button
-                key={template.templateId}
-                type="button"
-                onClick={() =>
-                  setSelectedTemplateId(
-                    selectedTemplateId === template.templateId
-                      ? null
-                      : template.templateId
-                  )
-                }
-                className={`group rounded-lg border p-3 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  selectedTemplateId === template.templateId
-                    ? 'border-primary bg-primary/5 shadow-sm'
-                    : 'border-border bg-card hover:border-primary/50 hover:shadow-sm'
-                }`}
-                aria-pressed={selectedTemplateId === template.templateId}
-              >
-                <div className="flex items-center gap-2">
-                  <LayoutTemplate
-                    className="h-4 w-4 shrink-0 text-primary"
-                    aria-hidden="true"
-                  />
-                  <span className="truncate text-sm font-medium text-card-foreground group-hover:text-primary">
-                    {template.name}
-                  </span>
-                </div>
-                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                  {template.description}
-                </p>
-              </button>
-            ))
-          )}
-        </div>
-
-        {selectedTemplate && (
-          <div className="mt-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2">
-            <p className="text-sm text-foreground">
-              <span className="font-medium">Selected:</span> {selectedTemplate.name}
-            </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {selectedTemplate.description}
-            </p>
-          </div>
-        )}
-      </section>
+      {/* Mode Toggle */}
+      <div className="flex items-center gap-1 rounded-lg bg-muted p-1 w-fit">
+        <button
+          type="button"
+          onClick={() => setCreateMode('manual')}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            createMode === 'manual'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Manual Prompt
+        </button>
+        <button
+          type="button"
+          onClick={() => setCreateMode('generator')}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            createMode === 'generator'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Prompt Generator
+        </button>
+      </div>
 
       {/* Prompt Input Section */}
       <section aria-labelledby="prompt-section-heading">
         <h2 id="prompt-section-heading" className="sr-only">
           Architecture Description
         </h2>
-        <PromptInput
-          onGenerate={handleGenerate}
-          isGenerating={isDrawioGenerating || isProcessing}
-        />
+        {createMode === 'manual' ? (
+          <PromptInput
+            onGenerate={handleGenerate}
+            isGenerating={isDrawioGenerating || isProcessing}
+            defaultValue={sharedPrompt}
+            key={sharedPrompt}
+          />
+        ) : (
+          <PromptGenerator
+            onPromptGenerated={handlePromptGenerated}
+            isDisabled={isDrawioGenerating || isProcessing || !isAuthenticated}
+          />
+        )}
       </section>
 
-      {/* Generation Progress */}
+      {/* Enhanced Generation Progress */}
       {(isDrawioGenerating || isProcessing) && (
-        <GenerationProgress state={state} />
+        <EnhancedGenerationProgress state={state} />
       )}
 
       {/* Generation Error */}
@@ -295,9 +238,109 @@ function CreateDiagramContent() {
   );
 }
 
+// --- Enhanced Generation Progress UI (Requirement 2) ---
+
+interface EnhancedProgressProps {
+  state: ReturnType<typeof useGenerationState>['state'];
+}
+
+const PROGRESS_STEPS = [
+  { label: 'Interpreting prompt...', threshold: 0 },
+  { label: 'Generating architecture...', threshold: 5000 },
+  { label: 'Rendering diagram...', threshold: 15000 },
+];
+
+function EnhancedGenerationProgress({ state }: EnhancedProgressProps) {
+  const [elapsed, setElapsed] = useState(0);
+  const startTimeRef = React.useRef(Date.now());
+
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+    const interval = setInterval(() => {
+      setElapsed(Date.now() - startTimeRef.current);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentStepIndex = PROGRESS_STEPS.reduce((acc, step, i) => {
+    return elapsed >= step.threshold ? i : acc;
+  }, 0);
+
+  const formatTime = (ms: number) => {
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    return `${Math.floor(s / 60)}m ${s % 60}s`;
+  };
+
+  return (
+    <div
+      className="rounded-lg border bg-card p-6 space-y-4"
+      role="status"
+      aria-live="polite"
+      aria-label="Generation in progress"
+    >
+      {/* Header with timer */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-foreground">Generating architecture diagram</p>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {formatTime(elapsed)}
+        </span>
+      </div>
+
+      {/* Animated progress bar */}
+      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+        <div className="h-full w-1/3 bg-primary rounded-full animate-pulse-slide" />
+      </div>
+
+      {/* Steps */}
+      <div className="space-y-2">
+        {PROGRESS_STEPS.map((step, index) => {
+          const isActive = index === currentStepIndex;
+          const isComplete = index < currentStepIndex;
+
+          return (
+            <div
+              key={step.label}
+              className={`flex items-center gap-3 rounded-md px-3 py-2 transition-all duration-300 ${
+                isActive ? 'bg-primary/5' : ''
+              } ${isComplete ? 'opacity-60' : ''}`}
+            >
+              <div className="flex-shrink-0">
+                {isActive ? (
+                  <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                ) : isComplete ? (
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
+                )}
+              </div>
+              <span className={`text-sm ${isActive ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Shimmer skeleton placeholder */}
+      <div className="mt-4 rounded-lg overflow-hidden">
+        <div
+          className="h-32 w-full rounded-lg"
+          style={{
+            background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 1.5s infinite',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Create Diagram page with Suspense boundary for useSearchParams.
- * Validates: Requirements 11.2
  */
 export default function CreateDiagramPage() {
   return (

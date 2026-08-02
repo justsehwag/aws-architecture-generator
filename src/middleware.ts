@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PROTECTED_ROUTES = ['/create', '/diagram', '/templates', '/settings', '/diagrams', '/import'];
+const PROTECTED_ROUTES = ['/diagram', '/templates', '/settings', '/diagrams', '/import'];
 
 function hasAuthCookie(request: NextRequest): boolean {
   const cookies = request.cookies;
@@ -75,5 +75,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/create/:path*', '/diagram/:path*', '/templates/:path*', '/settings/:path*', '/diagrams/:path*', '/import/:path*', '/api/:path*'],
+  matcher: ['/diagram/:path*', '/templates/:path*', '/settings/:path*', '/diagrams/:path*', '/import/:path*', '/api/:path*'],
 };

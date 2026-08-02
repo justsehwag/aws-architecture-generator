@@ -7,6 +7,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AppErrorBoundary } from "@/components/error/AppErrorBoundary";
 import { PageErrorBoundary } from "@/components/error/PageErrorBoundary";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
                 <AppLayout>
                   <PageErrorBoundary>{children}</PageErrorBoundary>
                 </AppLayout>
+                <Toaster />
               </I18nProvider>
             </ThemeProvider>
           </AuthProvider>

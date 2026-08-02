@@ -59,7 +59,7 @@ const SUGGESTION_CHIPS = [
   { label: "Suggest improvements", mode: "chat" as const },
   { label: "List all services", mode: "chat" as const },
   { label: "Add CloudWatch monitoring", mode: "xml" as const },
-  { label: "Estimate monthly cost", mode: "chat" as const },
+  { label: "Get AWS Pricing Estimate", mode: "chat" as const },
 ];
 
 // --- Helpers ---
