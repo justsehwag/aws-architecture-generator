@@ -174,7 +174,7 @@ export default function DiagramViewerPage() {
           const cachedData = JSON.parse(cached);
           const spec = cachedData.architectureSpec;
           
-          // Generate basic drawio XML from architecture spec if no XML present
+          // Use drawioXml directly if available (from generate-xml endpoint)
           let xml = cachedData.drawioXml || "";
           if (!xml && spec?.services) {
             xml = generateDrawioXmlFromSpec(spec);

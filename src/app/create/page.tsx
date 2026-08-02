@@ -67,13 +67,10 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        const response = await fetch('/api/diagrams/generate', {
+        const response = await fetch('/api/diagrams/generate-xml', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt,
-            templateId: selectedTemplateId || undefined,
-          }),
+          body: JSON.stringify({ prompt }),
         });
 
         if (!response.ok) {
@@ -82,9 +79,6 @@ function CreateDiagramContent() {
 
           if (response.status === 422 && code === 'PARSE_FAILURE') {
             const parseError = createParseError(prompt);
-            if (body?.suggestions) {
-              parseError.suggestions = body.suggestions as string[];
-            }
             setError({ message: parseError.message, suggestions: parseError.suggestions });
             setGenerationError(parseError);
             return;
