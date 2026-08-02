@@ -15,6 +15,8 @@ interface ChatMessage {
 interface DiagramChatProps {
   /** Current architecture spec JSON */
   architectureSpec: unknown;
+  /** Current Draw.io XML of the diagram */
+  currentXml?: string;
   /** Callback when AI generates updated architecture */
   onArchitectureUpdate?: (spec: unknown, xml: string) => void;
   className?: string;
@@ -25,7 +27,7 @@ interface DiagramChatProps {
  * Reads current diagram state and sends modifications to Bedrock.
  * Updates the Draw.io editor in real-time.
  */
-export function DiagramChat({ architectureSpec, onArchitectureUpdate, className }: DiagramChatProps) {
+export function DiagramChat({ architectureSpec, currentXml, onArchitectureUpdate, className }: DiagramChatProps) {
   const [messages, setMessages] = React.useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -71,8 +73,11 @@ export function DiagramChat({ architectureSpec, onArchitectureUpdate, className 
     setIsLoading(true);
 
     try {
-      // Send current architecture as context + user's modification request
-      const fullPrompt = `You have an existing AWS architecture. The current services are:\n\n${currentContext}\n\nThe user wants to: ${userPrompt}\n\nGenerate the COMPLETE updated architecture as Draw.io XML. Include ALL existing services plus the requested changes. Keep all existing services unless explicitly asked to remove them.`;
+      // Send current diagram XML + user's modification request
+      // Claude will modify the existing diagram rather than creating from scratch
+      const fullPrompt = currentXml 
+        ? `You have an existing AWS architecture diagram as Draw.io XML. Here is the CURRENT diagram XML:\n\n${currentXml}\n\nThe user wants to make this change: "${userPrompt}"\n\nModify the existing diagram XML to incorporate the requested change. Keep ALL existing services, connections, and layout intact. Only add, remove, or modify what the user specifically asked for. Return the COMPLETE updated Draw.io XML.`
+        : `Generate a professional AWS architecture diagram as Draw.io XML for: ${userPrompt}`;
 
       const functionUrl = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL || 'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
       const response = await fetch(functionUrl, {
