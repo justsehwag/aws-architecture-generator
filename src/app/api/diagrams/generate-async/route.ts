@@ -3,7 +3,7 @@
  *
  * Starts an async diagram generation job.
  * Returns a jobId immediately — frontend polls /api/diagrams/jobs/[jobId] for result.
- * This eliminates timeout issues regardless of model speed.
+ * Uses DynamoDB to store job state across Lambda invocations.
  */
 
 export const maxDuration = 300;
@@ -15,7 +15,8 @@ import { buildGenerationMessages } from '@/lib/llm/prompts';
 import { validateArchitectureSpec } from '@/lib/llm/schema-validator';
 import { getLLMConfig } from '@/lib/llm/types';
 import { generateExplanation } from '@/lib/explanation';
-import { getJobStore } from '../jobs/[jobId]/route';
+import { docClient, TABLE_NAMES } from '@/lib/db/client';
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const requestSchema = z.object({
   prompt: z.string().min(5).max(5000),
@@ -35,43 +36,57 @@ export async function POST(request: NextRequest) {
 
   const { prompt } = validation.data;
   const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-  const jobs = getJobStore();
 
-  // Store job as pending
-  jobs.set(jobId, { status: 'pending' });
+  // Store job as pending in DynamoDB
+  try {
+    await docClient.send(new PutCommand({
+      TableName: TABLE_NAMES.DIAGRAMS,
+      Item: {
+        PK: `JOB#${jobId}`,
+        SK: `JOB#${jobId}`,
+        jobId,
+        status: 'pending',
+        prompt,
+        createdAt: new Date().toISOString(),
+        TTL: Math.floor(Date.now() / 1000) + 3600, // expire in 1 hour
+      },
+    }));
+  } catch (err) {
+    console.error('Failed to create job:', err);
+    return NextResponse.json({ error: 'Failed to start generation' }, { status: 500 });
+  }
 
-  // Start the generation in background (don't await)
-  generateInBackground(jobId, prompt, jobs).catch((err) => {
-    jobs.set(jobId, { status: 'error', error: err instanceof Error ? err.message : 'Unknown error' });
+  // Start generation in background (don't await — this continues after response is sent)
+  generateInBackground(jobId, prompt).catch((err) => {
+    console.error(`Job ${jobId} failed:`, err);
   });
 
-  // Return immediately with jobId
+  // Return immediately
   return NextResponse.json({ jobId, status: 'pending' });
 }
 
-async function generateInBackground(jobId: string, prompt: string, jobs: Map<string, unknown>) {
+async function generateInBackground(jobId: string, prompt: string) {
   const llmConfig = getLLMConfig();
   const messages = buildGenerationMessages(prompt, llmConfig.model);
 
-  const llmResponse = await callLLMWithRetry(
-    messages.map(m => ({ ...m, role: m.role as 'system' | 'user' | 'assistant' })),
-    llmConfig
-  );
+  try {
+    const llmResponse = await callLLMWithRetry(
+      messages.map(m => ({ ...m, role: m.role as 'system' | 'user' | 'assistant' })),
+      llmConfig
+    );
 
-  const specValidation = validateArchitectureSpec(llmResponse.content);
+    const specValidation = validateArchitectureSpec(llmResponse.content);
 
-  if (!specValidation.success) {
-    jobs.set(jobId, { status: 'error', error: 'Failed to parse architecture specification' });
-    return;
-  }
+    if (!specValidation.success) {
+      await updateJobStatus(jobId, 'error', null, 'Failed to parse architecture');
+      return;
+    }
 
-  const architectureSpec = specValidation.data;
-  const diagramId = `diag-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-  const explanation = generateExplanation(architectureSpec);
+    const architectureSpec = specValidation.data;
+    const diagramId = `diag-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const explanation = generateExplanation(architectureSpec);
 
-  jobs.set(jobId, {
-    status: 'complete',
-    result: {
+    const result = {
       diagramId,
       architectureSpec,
       explanation,
@@ -79,6 +94,31 @@ async function generateInBackground(jobId: string, prompt: string, jobs: Map<str
       serviceCount: architectureSpec.services.length,
       model: llmResponse.model,
       region: architectureSpec.region,
-    },
-  });
+    };
+
+    await updateJobStatus(jobId, 'complete', result, null);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    await updateJobStatus(jobId, 'error', null, msg);
+  }
+}
+
+async function updateJobStatus(jobId: string, status: string, result: unknown, error: string | null) {
+  try {
+    await docClient.send(new PutCommand({
+      TableName: TABLE_NAMES.DIAGRAMS,
+      Item: {
+        PK: `JOB#${jobId}`,
+        SK: `JOB#${jobId}`,
+        jobId,
+        status,
+        result: result ? JSON.stringify(result) : null,
+        error,
+        updatedAt: new Date().toISOString(),
+        TTL: Math.floor(Date.now() / 1000) + 3600,
+      },
+    }));
+  } catch (err) {
+    console.error(`Failed to update job ${jobId}:`, err);
+  }
 }

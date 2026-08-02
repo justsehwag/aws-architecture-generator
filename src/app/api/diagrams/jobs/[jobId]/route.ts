@@ -1,45 +1,43 @@
 /**
  * GET /api/diagrams/jobs/[jobId]
  *
- * Polls the status of an async diagram generation job.
- * Returns the result when the job is complete.
+ * Polls the status of an async diagram generation job from DynamoDB.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-
-// In-memory job store (for Amplify SSR — same process handles both start and poll)
-// For production, this should be DynamoDB
-const globalJobs = (globalThis as unknown as { __diagramJobs?: Map<string, unknown> });
-if (!globalJobs.__diagramJobs) {
-  globalJobs.__diagramJobs = new Map();
-}
-
-export function getJobStore(): Map<string, unknown> {
-  return globalJobs.__diagramJobs!;
-}
+import { docClient, TABLE_NAMES } from '@/lib/db/client';
+import { GetCommand } from '@aws-sdk/lib-dynamodb';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { jobId: string } }
 ) {
   const jobId = params.jobId;
-  const jobs = getJobStore();
-  const job = jobs.get(jobId) as { status: string; result?: unknown; error?: string } | undefined;
 
-  if (!job) {
-    return NextResponse.json({ status: 'not_found' }, { status: 404 });
+  try {
+    const result = await docClient.send(new GetCommand({
+      TableName: TABLE_NAMES.DIAGRAMS,
+      Key: { PK: `JOB#${jobId}`, SK: `JOB#${jobId}` },
+    }));
+
+    if (!result.Item) {
+      return NextResponse.json({ status: 'not_found' }, { status: 404 });
+    }
+
+    const job = result.Item;
+
+    if (job.status === 'complete' && job.result) {
+      const parsed = typeof job.result === 'string' ? JSON.parse(job.result) : job.result;
+      return NextResponse.json({ status: 'complete', result: parsed });
+    }
+
+    if (job.status === 'error') {
+      return NextResponse.json({ status: 'error', error: job.error || 'Generation failed' });
+    }
+
+    return NextResponse.json({ status: 'pending' });
+  } catch (err) {
+    console.error('Failed to check job status:', err);
+    return NextResponse.json({ status: 'pending' }); // Don't error, just say pending
   }
-
-  if (job.status === 'complete') {
-    // Clean up after delivery
-    jobs.delete(jobId);
-    return NextResponse.json({ status: 'complete', result: job.result });
-  }
-
-  if (job.status === 'error') {
-    jobs.delete(jobId);
-    return NextResponse.json({ status: 'error', error: job.error }, { status: 500 });
-  }
-
-  return NextResponse.json({ status: 'pending' });
 }
