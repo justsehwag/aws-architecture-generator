@@ -920,7 +920,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
-     "S3Key": "bb5714b1158d2a4b9b3ae5c03d9933ef10b13b382968b03af360bc85175db3db.zip"
+     "S3Key": "efa2aaf93a568910c7a3e146ae8bd389f182c8fd4df2725251bf2b1d9f08f69a.zip"
     },
     "Description": "Generates Draw.io XML directly from architecture prompts via Bedrock Claude Sonnet",
     "Environment": {
@@ -947,7 +947,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/Resource",
-    "aws:asset:path": "asset.bb5714b1158d2a4b9b3ae5c03d9933ef10b13b382968b03af360bc85175db3db",
+    "aws:asset:path": "asset.efa2aaf93a568910c7a3e146ae8bd389f182c8fd4df2725251bf2b1d9f08f69a",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

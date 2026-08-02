@@ -12,6 +12,15 @@
 import { useState, useEffect, useCallback } from 'react';
 
 /**
+ * Counts AWS services from draw.io XML by matching aws4 shape references.
+ */
+function countServicesFromXml(xml?: string): number {
+  if (!xml) return 0;
+  const matches = xml.match(/shape=mxgraph\.aws4\./g);
+  return matches ? matches.length : 0;
+}
+
+/**
  * A recent diagram displayed on the dashboard.
  */
 export interface RecentDiagram {
@@ -76,7 +85,7 @@ export function useDashboard(): UseDashboardReturn {
       // Merge with localStorage drafts (for diagrams not yet in DynamoDB)
       if (typeof window !== 'undefined') {
         try {
-          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; spec?: { services?: unknown[] } }>;
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; xml?: string; spec?: { services?: unknown[] } }>;
           const existingIds = new Set(diagrams.map(d => d.diagramId));
           for (const draft of drafts) {
             if (!existingIds.has(draft.diagramId)) {
@@ -84,7 +93,7 @@ export function useDashboard(): UseDashboardReturn {
                 diagramId: draft.diagramId,
                 name: draft.name || 'Untitled',
                 updatedAt: draft.createdAt,
-                serviceCount: (draft.spec?.services as unknown[])?.length || 0,
+                serviceCount: (draft.spec?.services as unknown[])?.length || countServicesFromXml(draft.xml) || 0,
                 status: 'draft',
               });
             }
@@ -101,12 +110,12 @@ export function useDashboard(): UseDashboardReturn {
       // If API fails, still show localStorage drafts
       if (typeof window !== 'undefined') {
         try {
-          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; spec?: { services?: unknown[] } }>;
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]') as Array<{ diagramId: string; name: string; createdAt: string; xml?: string; spec?: { services?: unknown[] } }>;
           const diagrams = drafts.map(d => ({
             diagramId: d.diagramId,
             name: d.name || 'Untitled',
             updatedAt: d.createdAt,
-            serviceCount: (d.spec?.services as unknown[])?.length || 0,
+            serviceCount: (d.spec?.services as unknown[])?.length || countServicesFromXml(d.xml) || 0,
             status: 'draft',
           }));
           setRecentDiagrams(diagrams);

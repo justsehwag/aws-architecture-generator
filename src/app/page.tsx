@@ -101,6 +101,9 @@ export default function DashboardPage() {
 
   const handleSoftDelete = (diagramId: string) => {
     softDeleteDiagram(diagramId);
+    // Also remove from sessionStorage
+    try { sessionStorage.removeItem(`diagram_${diagramId}`); } catch {}
+    // Force refresh the dashboard data
     setDeletedDiagrams(getDeletedDiagrams());
     refresh();
   };
@@ -187,7 +190,7 @@ export default function DashboardPage() {
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-32 animate-pulse rounded-lg border border-border bg-muted/50"
+                className="h-32 rounded-lg border border-border bg-muted/50 animate-[pulse_2s_ease-in-out_infinite]"
                 aria-hidden="true"
               />
             ))}
@@ -209,7 +212,7 @@ export default function DashboardPage() {
             {recentDiagrams.map((diagram) => (
               <div
                 key={diagram.diagramId}
-                className="group relative rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+                className="group relative rounded-lg border border-border bg-card p-4 transition-colors duration-150 hover:border-primary/50 hover:shadow-md"
               >
                 <Link
                   href={`/diagram/${diagram.diagramId}`}
@@ -237,7 +240,7 @@ export default function DashboardPage() {
                     e.stopPropagation();
                     handleSoftDelete(diagram.diagramId);
                   }}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                  className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
                   aria-label={`Delete ${diagram.name}`}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -330,7 +333,7 @@ export default function DashboardPage() {
             <Link
               key={template.id}
               href={`/create?template=${template.id}`}
-              className="group rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="group rounded-lg border border-border bg-card p-4 transition-colors duration-150 hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <div className="flex items-center gap-2">
                 <LayoutDashboard
