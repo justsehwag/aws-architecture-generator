@@ -72,9 +72,9 @@ export function DiagramChat({ architectureSpec, onArchitectureUpdate, className 
 
     try {
       // Send current architecture as context + user's modification request
-      const fullPrompt = `You have an existing AWS architecture diagram. The current services are:\n\n${currentContext}\n\nThe user wants to: ${userPrompt}\n\nGenerate a COMPLETE updated Draw.io XML diagram with ALL existing services plus the requested changes. Use official AWS mxgraph.aws4 icons. Keep all existing services unless explicitly asked to remove them.`;
+      const fullPrompt = `You have an existing AWS architecture. The current services are:\n\n${currentContext}\n\nThe user wants to: ${userPrompt}\n\nGenerate the COMPLETE updated architecture including ALL existing services plus the requested changes. Keep all existing services unless explicitly asked to remove them.`;
 
-      const response = await fetch("/api/diagrams/generate-xml", {
+      const response = await fetch("/api/diagrams/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: fullPrompt }),
@@ -82,18 +82,21 @@ export function DiagramChat({ architectureSpec, onArchitectureUpdate, className 
 
       if (response.ok) {
         const data = await response.json();
+        const newSpec = data.architectureSpec;
+        const serviceCount = newSpec?.services?.length || 0;
 
         const aiMessage: ChatMessage = {
           id: `msg-${Date.now()}-ai`,
           role: "assistant",
-          content: `Done! Diagram updated. ${data.name ? `"${data.name}"` : ''}`,
+          content: `Done! Updated architecture now has ${serviceCount} services. The diagram is refreshing...`,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, aiMessage]);
 
-        // Update the diagram with new XML
-        if (onArchitectureUpdate && data.drawioXml) {
-          onArchitectureUpdate(null, data.drawioXml);
+        // Generate XML from the new spec and notify parent
+        if (onArchitectureUpdate && newSpec) {
+          const xml = generateXmlFromSpec(newSpec);
+          onArchitectureUpdate(newSpec, xml);
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
