@@ -33,68 +33,76 @@ interface DiagramData {
 }
 
 /**
- * Generates a basic Draw.io XML diagram from an ArchitectureSpec.
- * Uses colored nodes grouped by service category (matching AWS color palette).
- * Places services in a grid layout with orthogonal edge connections.
+ * Generates a professional AWS architecture diagram using tiered auto-layout.
+ * Tier 1 (left): Edge/CDN - CloudFront, Route53, WAF
+ * Tier 2: Load Balancing - ALB, NLB, API Gateway
+ * Tier 3: Compute - Lambda, ECS, Fargate, EC2
+ * Tier 4: Data - RDS, Aurora, DynamoDB, S3, ElastiCache
+ * Tier 5 (bottom): Security/Monitoring - IAM, CloudWatch, KMS
  */
 function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label: string; type: string; groupId?: string }>; connections?: Array<{ id: string; sourceId: string; targetId: string; label?: string }>; groups?: Array<{ id: string; label: string; type: string; children?: string[] }> }): string {
   const services = spec.services || [];
   const connections = spec.connections || [];
-  const cols = Math.max(3, Math.ceil(Math.sqrt(services.length)));
 
-  // AWS category colors
-  const categoryColors: Record<string, { fill: string; stroke: string }> = {
-    compute: { fill: '#ED7100', stroke: '#C25400' },
-    storage: { fill: '#3F8624', stroke: '#2D6A1B' },
-    database: { fill: '#C925D1', stroke: '#9B1EA8' },
-    networking: { fill: '#8C4FFF', stroke: '#6B3ACC' },
-    security: { fill: '#DD344C', stroke: '#B22A3D' },
-    integration: { fill: '#E7157B', stroke: '#B8115F' },
-    analytics: { fill: '#8C4FFF', stroke: '#6B3ACC' },
-    ml: { fill: '#01A88D', stroke: '#01856E' },
-    management: { fill: '#E7157B', stroke: '#B8115F' },
-    general: { fill: '#232F3E', stroke: '#1A2330' },
+  // Tier assignment
+  const tierMap: Record<string, number> = {
+    'route53': 0, cloudfront: 0, waf: 0,
+    alb: 1, nlb: 1, elb: 1, 'api-gateway': 1, cognito: 1,
+    lambda: 2, ecs: 2, eks: 2, fargate: 2, ec2: 2, 'app-runner': 2, 'step-functions': 2,
+    rds: 3, aurora: 3, dynamodb: 3, s3: 3, elasticache: 3, redshift: 3, opensearch: 3,
+    iam: 4, kms: 4, cloudwatch: 4, cloudtrail: 4, 'secrets-manager': 4, vpc: 4, 'nat-gateway': 4,
+    sqs: 2, sns: 2, eventbridge: 2, kinesis: 3, sagemaker: 3, bedrock: 2, ecr: 4,
   };
 
-  // Service type to category mapping
-  const serviceCategory: Record<string, string> = {
-    ec2: 'compute', lambda: 'compute', ecs: 'compute', eks: 'compute', fargate: 'compute',
-    s3: 'storage', ebs: 'storage', efs: 'storage',
-    rds: 'database', aurora: 'database', dynamodb: 'database', elasticache: 'database', redshift: 'database',
-    vpc: 'networking', cloudfront: 'networking', 'route53': 'networking', alb: 'networking', nlb: 'networking', elb: 'networking', 'api-gateway': 'networking', 'nat-gateway': 'networking',
-    iam: 'security', cognito: 'security', waf: 'security', kms: 'security', 'secrets-manager': 'security',
-    sqs: 'integration', sns: 'integration', eventbridge: 'integration', 'step-functions': 'integration',
-    kinesis: 'analytics', athena: 'analytics', glue: 'analytics', opensearch: 'analytics',
-    sagemaker: 'ml', bedrock: 'ml',
-    cloudwatch: 'management', cloudtrail: 'management',
+  // Category colors for fillColor
+  const colorMap: Record<string, string> = {
+    'route53': '#8C4FFF', cloudfront: '#8C4FFF', waf: '#DD344C',
+    alb: '#8C4FFF', nlb: '#8C4FFF', elb: '#8C4FFF', 'api-gateway': '#E7157B', cognito: '#DD344C',
+    lambda: '#ED7100', ecs: '#ED7100', eks: '#ED7100', fargate: '#ED7100', ec2: '#ED7100', 'app-runner': '#ED7100', 'step-functions': '#E7157B',
+    rds: '#C925D1', aurora: '#C925D1', dynamodb: '#C925D1', s3: '#3F8624', elasticache: '#C925D1', redshift: '#C925D1', opensearch: '#8C4FFF',
+    iam: '#DD344C', kms: '#DD344C', cloudwatch: '#E7157B', cloudtrail: '#E7157B', 'secrets-manager': '#DD344C', vpc: '#8C4FFF', 'nat-gateway': '#8C4FFF',
+    sqs: '#E7157B', sns: '#E7157B', eventbridge: '#E7157B', kinesis: '#8C4FFF', sagemaker: '#01A88D', bedrock: '#01A88D', ecr: '#ED7100',
   };
 
-  let cells = '<mxCell id="0"/><mxCell id="1" parent="0"/>';
-  
-  services.forEach((svc, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    // Use LLM-provided position if available, otherwise grid layout
-    const pos = (svc as unknown as { position?: { x: number; y: number } }).position;
-    const x = pos?.x ?? (80 + col * 200);
-    const y = pos?.y ?? (80 + row * 140);
-    const cat = serviceCategory[svc.type] || 'general';
-    const colors = categoryColors[cat] || categoryColors.general;
-    const escapedLabel = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    // Map service types to correct Draw.io resIcon names
-    const iconMap: Record<string, string> = {
-      'api-gateway': 'api_gateway', 'nat-gateway': 'vpc_nat_gateway', 'route53': 'route_53',
-      'step-functions': 'step_functions', 'elastic-beanstalk': 'elastic_beanstalk',
-      'secrets-manager': 'secrets_manager', 'certificate-manager': 'certificate_manager',
-      'security-group': 'security_group', 'app-runner': 'app_runner',
-    };
-    const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
-    cells += `<mxCell id="${svc.id}" value="${escapedLabel}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${colors.fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="48" height="48" as="geometry"/></mxCell>`;
+  const iconMap: Record<string, string> = {
+    'api-gateway': 'api_gateway', 'nat-gateway': 'vpc_nat_gateway', 'route53': 'route_53',
+    'step-functions': 'step_functions', 'elastic-beanstalk': 'elastic_beanstalk',
+    'secrets-manager': 'secrets_manager', 'certificate-manager': 'certificate_manager',
+    'app-runner': 'app_runner',
+  };
+
+  // Sort services into tiers
+  const tiers: Array<typeof services> = [[], [], [], [], []];
+  services.forEach(svc => {
+    const tier = tierMap[svc.type] ?? 2;
+    tiers[tier].push(svc);
   });
 
+  // Layout: each tier is a column, services spread vertically within
+  const tierX = [60, 260, 480, 720, 480]; // x position per tier
+  const startY = 60;
+  const spacingY = 120;
+
+  let cells = '<mxCell id="0"/><mxCell id="1" parent="0"/>';
+
+  // Place services
+  const positions: Record<string, { x: number; y: number }> = {};
+  tiers.forEach((tierServices, tierIdx) => {
+    tierServices.forEach((svc, i) => {
+      const x = tierX[tierIdx];
+      const y = tierIdx === 4 ? startY + (tiers[2].length + 1) * spacingY + i * spacingY : startY + i * spacingY;
+      positions[svc.id] = { x, y };
+      const fill = colorMap[svc.type] || '#232F3E';
+      const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
+      const label = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      cells += `<mxCell id="${svc.id}" value="${label}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="60" height="60" as="geometry"/></mxCell>`;
+    });
+  });
+
+  // Place connections with proper edge styles
   connections.forEach((conn) => {
-    const escapedLabel = (conn.label || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    cells += `<mxCell id="${conn.id}" value="${escapedLabel}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#FFFFFF;fontSize=10;fontColor=#FFFFFF;labelBackgroundColor=none;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
+    const label = (conn.label || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    cells += `<mxCell id="${conn.id}" value="${label}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;fontSize=9;fontColor=#666666;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="${conn.sourceId}" target="${conn.targetId}" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>`;
   });
 
   return `<?xml version="1.0" encoding="UTF-8"?><mxfile><diagram name="Architecture"><mxGraphModel><root>${cells}</root></mxGraphModel></diagram></mxfile>`;
