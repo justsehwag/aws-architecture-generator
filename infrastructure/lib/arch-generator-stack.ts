@@ -318,7 +318,10 @@ export class ArchGeneratorStack extends cdk.Stack {
     drawioGeneratorFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
-        resources: ['arn:aws:bedrock:*::foundation-model/anthropic.*'],
+        resources: [
+          'arn:aws:bedrock:*::foundation-model/anthropic.*',
+          `arn:aws:bedrock:*:${cdk.Aws.ACCOUNT_ID}:inference-profile/*`,
+        ],
       })
     );
 

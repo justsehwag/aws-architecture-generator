@@ -35,7 +35,8 @@ export function isDrawioGenerateError(
 export async function generateDrawioXml(
   request: DrawioGenerateRequest
 ): Promise<DrawioGenerateResponse> {
-  const url = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL;
+  // Hardcoded Function URL - bypasses any env var issues in Amplify SSR
+  const url = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL || 'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
 
   if (!url) {
     throw {

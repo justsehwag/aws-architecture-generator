@@ -136,16 +136,16 @@
         }
       }
     },
-    "41da3d31d4930a989fdb6349bf4bb99489794039ee16a06f7305256edb6cbe78": {
+    "b3a4e84759e97a0d815f0fafe5476e6ed88abb42421ac082625bf5687ca4b1ac": {
       "displayName": "ArchGeneratorStack Template",
       "source": {
         "path": "ArchGeneratorStack.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "915233244358-ap-south-1-a622817a": {
+        "915233244358-ap-south-1-fac3a5e0": {
           "bucketName": "cdk-hnb659fds-assets-915233244358-ap-south-1",
-          "objectKey": "41da3d31d4930a989fdb6349bf4bb99489794039ee16a06f7305256edb6cbe78.json",
+          "objectKey": "b3a4e84759e97a0d815f0fafe5476e6ed88abb42421ac082625bf5687ca4b1ac.json",
           "region": "ap-south-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::915233244358:role/cdk-hnb659fds-file-publishing-role-915233244358-ap-south-1"
         }

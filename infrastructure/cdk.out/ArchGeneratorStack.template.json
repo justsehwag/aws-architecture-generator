@@ -885,7 +885,21 @@
         "bedrock:InvokeModelWithResponseStream"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:bedrock:*::foundation-model/anthropic.*"
+       "Resource": [
+        "arn:aws:bedrock:*::foundation-model/anthropic.*",
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:bedrock:*:",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           ":inference-profile/*"
+          ]
+         ]
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"

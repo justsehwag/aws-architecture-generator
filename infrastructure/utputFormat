@@ -1,0 +1,12 @@
+HTTP/1.1 400 Bad Request
+Date: Sun, 02 Aug 2026 15:37:31 GMT
+Content-Type: application/json
+Content-Length: 116
+Connection: keep-alive
+x-amzn-RequestId: 9ccda4bb-3fdb-480f-b5f9-13b33fe1493c
+access-control-allow-origin: *
+access-control-allow-headers: Content-Type
+access-control-allow-methods: POST, OPTIONS
+X-Amzn-Trace-Id: Root=1-6a6f643b-7e5184cf7e9334580d53428e;Parent=7aae26e87e377984;Sampled=0;Lineage=1:a872f701:0
+
+{"error":"Invalid JSON in request body","code":"INVALID_REQUEST","requestId":"9ccda4bb-3fdb-480f-b5f9-13b33fe1493c"}
