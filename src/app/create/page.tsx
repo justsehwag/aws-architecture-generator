@@ -67,56 +67,61 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        // Use Amplify SSR route (Haiku responds within 25s)
-        const response = await fetch('/api/diagrams/generate', {
+        // Start async generation job (returns immediately)
+        const startResponse = await fetch('/api/diagrams/generate-async', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt,
-            templateId: selectedTemplateId || undefined,
-          }),
+          body: JSON.stringify({ prompt }),
         });
 
-        if (!response.ok) {
-          const body = await response.json().catch(() => ({})) as Record<string, unknown>;
-          const code = body?.code as string | undefined;
-
-          if (response.status === 422 && code === 'PARSE_FAILURE') {
-            const parseError = createParseError(prompt);
-            if (body?.suggestions) {
-              parseError.suggestions = body.suggestions as string[];
-            }
-            setError({ message: parseError.message, suggestions: parseError.suggestions });
-            setGenerationError(parseError);
-            return;
-          }
-
-          if (response.status === 504 || code === 'TIMEOUT') {
-            const timeoutError = createTimeoutError();
-            setError({ message: timeoutError.message });
-            setGenerationError(timeoutError);
-            return;
-          }
-
-          const apiError = createApiError(response.status);
-          setError({ message: apiError.message });
+        if (!startResponse.ok) {
+          const body = await startResponse.json().catch(() => ({})) as Record<string, unknown>;
+          const apiError = createApiError(startResponse.status);
+          setError({ message: (body.error as string) || apiError.message });
           setGenerationError(apiError);
           return;
         }
 
-        const data = await response.json();
+        const { jobId } = await startResponse.json();
 
-        // Success
+        // Poll for result every 3 seconds
         setStep('generating-diagram');
-        setStep('analyzing');
-        setReady();
+        let attempts = 0;
+        const maxAttempts = 60; // 3 minutes max
 
-        if (data.diagramId) {
-          try {
-            sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data));
-          } catch { /* ignore */ }
-          router.push(`/diagram/${data.diagramId}`);
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          attempts++;
+
+          const pollResponse = await fetch(`/api/diagrams/jobs/${jobId}`);
+          const pollData = await pollResponse.json();
+
+          if (pollData.status === 'complete') {
+            const data = pollData.result;
+            setStep('analyzing');
+            setReady();
+
+            if (data.diagramId) {
+              try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
+              router.push(`/diagram/${data.diagramId}`);
+            }
+            return;
+          }
+
+          if (pollData.status === 'error') {
+            const apiError = createApiError(500);
+            setError({ message: pollData.error || apiError.message });
+            setGenerationError(apiError);
+            return;
+          }
+
+          // Still pending — continue polling
         }
+
+        // Max attempts reached
+        const timeoutError = createTimeoutError();
+        setError({ message: timeoutError.message });
+        setGenerationError(timeoutError);
       } catch {
         const networkError = createNetworkError();
         setError({ message: networkError.message });
