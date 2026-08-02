@@ -46,7 +46,7 @@ export interface LambdaFunctionURLResponse {
 const BEDROCK_MODEL_ID = process.env.BEDROCK_MODEL_ID || 'us.anthropic.claude-sonnet-4-5-20250929-v1:0';
 const BEDROCK_REGION = process.env.BEDROCK_REGION || 'us-east-1';
 const MAX_RETRIES = 2; // 3 total attempts (1 initial + 2 retries)
-const REQUEST_TIMEOUT_MS = 120_000; // 120 seconds per attempt (large XML context needs more time)
+const REQUEST_TIMEOUT_MS = 300_000; // 5 minutes per attempt — generous for large XML contexts
 
 const MIN_PROMPT_LENGTH = 10;
 const MAX_PROMPT_LENGTH = 50000; // Increased to support chat context with existing XML
