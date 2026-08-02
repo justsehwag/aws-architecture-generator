@@ -38,6 +38,20 @@ export function DrawioEmbed({
     xmlRef.current = xml;
   }, [xml]);
 
+  // Reload XML into iframe when xml prop changes (e.g., chat updates)
+  React.useEffect(() => {
+    if (isLoaded && xml && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({
+          action: "load",
+          xml: xml,
+          autosave: 1,
+        }),
+        "*"
+      );
+    }
+  }, [xml, isLoaded]);
+
   // Handle messages from draw.io iframe
   React.useEffect(() => {
     function handleMessage(event: MessageEvent) {
