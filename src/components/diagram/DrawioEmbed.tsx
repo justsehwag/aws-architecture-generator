@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 interface DrawioEmbedProps {
@@ -30,6 +31,7 @@ export function DrawioEmbed({
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const xmlRef = React.useRef(xml);
+  const { resolvedTheme } = useTheme();
 
   // Keep ref in sync
   React.useEffect(() => {
@@ -82,6 +84,7 @@ export function DrawioEmbed({
 
   // Build draw.io embed URL with AWS libraries enabled
   const drawioUrl = React.useMemo(() => {
+    const isDark = resolvedTheme === 'dark';
     const params = new URLSearchParams({
       embed: "1",
       proto: "json",
@@ -89,13 +92,13 @@ export function DrawioEmbed({
       libraries: "1",
       // Load all AWS shape libraries
       libs: "aws4",
-      ui: "dark",
+      ui: isDark ? "dark" : "kennedy",
       noSaveBtn: "1",
       noExitBtn: "1",
       saveAndExit: "0",
     });
     return `https://embed.diagrams.net/?${params.toString()}`;
-  }, [editable]);
+  }, [editable, resolvedTheme]);
 
   return (
     <div className={cn("relative h-full w-full", className)}>
