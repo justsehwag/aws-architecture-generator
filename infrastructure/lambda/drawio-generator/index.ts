@@ -62,14 +62,13 @@ const bedrockClient = new BedrockRuntimeClient({ region: BEDROCK_REGION });
 // ============================================================
 
 /**
- * Returns standard CORS headers included in all responses.
+ * Returns standard response headers.
+ * Note: CORS headers are handled automatically by the Lambda Function URL
+ * infrastructure configuration. Do NOT add them here or you get duplicate headers.
  */
-function corsHeaders(): Record<string, string> {
+function responseHeaders(): Record<string, string> {
   return {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
   };
 }
 
@@ -85,7 +84,7 @@ function errorResponse(
 ): LambdaFunctionURLResponse {
   return {
     statusCode,
-    headers: corsHeaders(),
+    headers: responseHeaders(),
     body: JSON.stringify({ error, code, requestId }),
   };
 }
@@ -346,7 +345,7 @@ async function generateDiagram(
 
     return {
       statusCode: 200,
-      headers: corsHeaders(),
+      headers: responseHeaders(),
       body: JSON.stringify({ drawioXml: extractedXml, diagramId }),
     };
   } catch (err: unknown) {
@@ -412,7 +411,7 @@ export const handler = async (
   if (method === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: corsHeaders(),
+      headers: responseHeaders(),
       body: '',
     };
   }
