@@ -67,61 +67,30 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        // Start async generation job (returns immediately)
-        const startResponse = await fetch('/api/diagrams/generate-async', {
+        // Use synchronous generation (Haiku responds within 15s)
+        const response = await fetch('/api/diagrams/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt }),
         });
 
-        if (!startResponse.ok) {
-          const body = await startResponse.json().catch(() => ({})) as Record<string, unknown>;
-          const apiError = createApiError(startResponse.status);
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+          const apiError = createApiError(response.status);
           setError({ message: (body.error as string) || apiError.message });
           setGenerationError(apiError);
           return;
         }
 
-        const { jobId } = await startResponse.json();
-
-        // Poll for result every 3 seconds
+        const data = await response.json();
         setStep('generating-diagram');
-        let attempts = 0;
-        const maxAttempts = 60; // 3 minutes max
+        setStep('analyzing');
+        setReady();
 
-        while (attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          attempts++;
-
-          const pollResponse = await fetch(`/api/diagrams/jobs/${jobId}`);
-          const pollData = await pollResponse.json();
-
-          if (pollData.status === 'complete') {
-            const data = pollData.result;
-            setStep('analyzing');
-            setReady();
-
-            if (data.diagramId) {
-              try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
-              router.push(`/diagram/${data.diagramId}`);
-            }
-            return;
-          }
-
-          if (pollData.status === 'error') {
-            const apiError = createApiError(500);
-            setError({ message: pollData.error || apiError.message });
-            setGenerationError(apiError);
-            return;
-          }
-
-          // Still pending — continue polling
+        if (data.diagramId) {
+          try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
+          router.push(`/diagram/${data.diagramId}`);
         }
-
-        // Max attempts reached
-        const timeoutError = createTimeoutError();
-        setError({ message: timeoutError.message });
-        setGenerationError(timeoutError);
       } catch {
         const networkError = createNetworkError();
         setError({ message: networkError.message });
