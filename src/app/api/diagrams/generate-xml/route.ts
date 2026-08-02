@@ -45,6 +45,18 @@ export async function POST(request: NextRequest) {
     // Strip markdown fences if present
     xml = xml.replace(/^```(?:xml)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
+    // Fix common LLM XML issues
+    // 1. Ensure all mxGeometry tags have as="geometry"
+    xml = xml.replace(/<mxGeometry([^>]*?)(?<!\bas="geometry")(\s*\/?>)/g, (match, attrs, end) => {
+      if (attrs.includes('as=')) return match;
+      return `<mxGeometry${attrs} as="geometry"${end}`;
+    });
+    // 2. Ensure all mxPoint tags have proper attributes
+    xml = xml.replace(/<mxPoint([^>]*?)(?<!\bas=)(\s*\/?>)/g, (match, attrs, end) => {
+      if (attrs.includes('as=')) return match;
+      return match; // mxPoint doesn't always need as=
+    });
+
     // Validate it looks like Draw.io XML
     if (!xml.includes('<mxfile') && !xml.includes('<mxGraphModel')) {
       return NextResponse.json({
