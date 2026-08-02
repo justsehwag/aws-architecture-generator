@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Send, Bot, User, Loader2, Sparkles } from "lucide-react";
+import { Send, Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -88,12 +88,117 @@ function detectMode(input: string): "chat" | "xml" {
       return "chat";
     }
   }
-  // If it ends with a question mark, treat as chat
   if (lower.endsWith("?")) {
     return "chat";
   }
   return "xml";
 }
+
+// --- Typing Effect Component ---
+
+function TypingMessage({ content }: { content: string }) {
+  const [displayed, setDisplayed] = React.useState("");
+  const [isDone, setIsDone] = React.useState(false);
+
+  React.useEffect(() => {
+    const words = content.split(" ");
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      setDisplayed(words.slice(0, current).join(" "));
+      if (current >= words.length) {
+        clearInterval(interval);
+        setIsDone(true);
+      }
+    }, 30);
+    return () => clearInterval(interval);
+  }, [content]);
+
+  return (
+    <span>
+      {isDone ? <FormattedMessage content={content} /> : displayed}
+      {!isDone && <span className="animate-pulse ml-0.5 text-primary">|</span>}
+    </span>
+  );
+}
+
+// --- Markdown-like Message Formatter ---
+
+function FormattedMessage({ content }: { content: string }) {
+  const lines = content.split("\n");
+
+  return (
+    <>
+      {lines.map((line, i) => {
+        const trimmed = line.trim();
+
+        // Bullet points
+        if (trimmed.startsWith("•") || trimmed.startsWith("-")) {
+          const text = trimmed.replace(/^[•\-]\s*/, "");
+          return (
+            <div key={i} className="flex gap-1.5 ml-2 my-0.5">
+              <span className="text-primary/70">•</span>
+              <span>{renderBold(text)}</span>
+            </div>
+          );
+        }
+
+        // Numbered lists
+        if (/^\d+[.)]\s/.test(trimmed)) {
+          const match = trimmed.match(/^(\d+[.)]\s*)(.*)/);
+          if (match) {
+            return (
+              <div key={i} className="flex gap-1.5 ml-2 my-0.5">
+                <span className="text-primary/70 font-medium">{match[1]}</span>
+                <span>{renderBold(match[2])}</span>
+              </div>
+            );
+          }
+        }
+
+        // Empty lines
+        if (trimmed === "") {
+          return <div key={i} className="h-2" />;
+        }
+
+        // Regular text
+        return (
+          <div key={i} className="my-0.5">
+            {renderBold(line)}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/** Render **bold** markers */
+function renderBold(text: string): React.ReactNode {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className="font-semibold">
+        {part}
+      </strong>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
+}
+
+// --- Loading Dots Component ---
+
+function LoadingDots() {
+  return (
+    <div className="flex items-center gap-1">
+      <span className="animate-bounce text-primary" style={{ animationDelay: "0ms" }}>●</span>
+      <span className="animate-bounce text-primary/70" style={{ animationDelay: "150ms" }}>●</span>
+      <span className="animate-bounce text-primary/40" style={{ animationDelay: "300ms" }}>●</span>
+    </div>
+  );
+}
+
+// --- Main Component ---
 
 /**
  * Chat panel for natural language diagram editing AND conversational Q&A.
@@ -175,7 +280,6 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
         const data = await response.json();
 
         if (data.mode === "chat") {
-          // Chat mode: display the text response
           const aiMessage: ChatMessage = {
             id: `msg-${Date.now()}-ai`,
             role: "assistant",
@@ -184,7 +288,6 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
           };
           setMessages((prev) => [...prev, aiMessage]);
         } else if (data.drawioXml) {
-          // XML mode: update the diagram
           const aiMessage: ChatMessage = {
             id: `msg-${Date.now()}-ai`,
             role: "assistant",
@@ -232,53 +335,69 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
     submitMessage(chipLabel);
   };
 
+  // Determine the latest assistant message id for typing effect
+  const latestAssistantId = React.useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") return messages[i].id;
+    }
+    return null;
+  }, [messages]);
+
   return (
     <div className={cn("flex flex-col h-full bg-background border-l border-border", className)}>
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold">Architecture Assistant</h3>
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
+        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+          <Sparkles className="h-4 w-4 text-primary" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold leading-none">Architecture Assistant</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">AI-powered diagram helper</p>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={cn(
-              "flex gap-2",
+              "flex gap-2.5",
               msg.role === "user" ? "justify-end" : "justify-start"
             )}
           >
             {msg.role === "assistant" && (
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                 <Bot className="h-3.5 w-3.5 text-primary" />
               </div>
             )}
             <div
               className={cn(
-                "max-w-[85%] rounded-lg px-3 py-2 text-xs whitespace-pre-wrap",
+                "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                 msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground"
+                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  : "bg-muted/80 text-foreground rounded-bl-md"
               )}
             >
-              {msg.content}
+              {msg.role === "assistant" ? (
+                msg.id === latestAssistantId && msg.id !== "welcome" ? (
+                  <TypingMessage content={msg.content} />
+                ) : (
+                  <FormattedMessage content={msg.content} />
+                )
+              ) : (
+                msg.content
+              )}
             </div>
-            {msg.role === "user" && (
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                <User className="h-3.5 w-3.5 text-primary-foreground" />
-              </div>
-            )}
           </div>
         ))}
         {isLoading && (
-          <div className="flex gap-2 items-center">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-              <Loader2 className="h-3.5 w-3.5 text-primary animate-spin" />
+          <div className="flex gap-2.5 items-start">
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+              <Bot className="h-3.5 w-3.5 text-primary" />
             </div>
-            <div className="bg-muted rounded-lg px-3 py-2 text-xs text-muted-foreground">
-              Thinking...
+            <div className="bg-muted/80 rounded-2xl rounded-bl-md px-4 py-3">
+              <LoadingDots />
             </div>
           </div>
         )}
@@ -288,15 +407,15 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
       {/* Suggestion Chips + Input */}
       <div className="border-t border-border">
         {/* Suggestion Chips */}
-        <div className="px-3 pt-3 pb-1 overflow-x-auto">
-          <div className="flex gap-1.5 flex-nowrap">
+        <div className="px-4 pt-3 pb-2">
+          <div className="grid grid-cols-2 gap-1.5">
             {SUGGESTION_CHIPS.map((chip) => (
               <button
                 key={chip.label}
                 type="button"
                 onClick={() => handleChipClick(chip.label)}
                 disabled={isLoading}
-                className="bg-muted hover:bg-muted/80 text-xs px-3 py-1.5 rounded-full whitespace-nowrap text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                className="border border-border hover:border-primary/40 hover:bg-primary/5 text-xs px-3 py-2 rounded-lg text-foreground/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left truncate"
               >
                 {chip.label}
               </button>
@@ -305,7 +424,7 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="p-3 pt-2">
+        <form onSubmit={handleSubmit} className="p-3 pt-1">
           <div className="flex gap-2">
             <textarea
               value={input}
@@ -317,7 +436,7 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
                 }
               }}
               placeholder="Ask a question or describe changes..."
-              className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               rows={2}
               disabled={isLoading}
             />
@@ -325,9 +444,9 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
               type="submit"
               size="icon"
               disabled={!input.trim() || isLoading}
-              className="self-end h-8 w-8"
+              className="self-end h-9 w-9 rounded-xl"
             >
-              <Send className="h-3.5 w-3.5" />
+              <Send className="h-4 w-4" />
             </Button>
           </div>
         </form>

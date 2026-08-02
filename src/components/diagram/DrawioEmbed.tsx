@@ -31,24 +31,27 @@ export function DrawioEmbed({
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const xmlRef = React.useRef(xml);
+  const prevXmlRef = React.useRef(xml);
   const { resolvedTheme } = useTheme();
-
-  // Keep ref in sync
-  React.useEffect(() => {
-    xmlRef.current = xml;
-  }, [xml]);
 
   // Reload XML into iframe when xml prop changes (e.g., chat updates)
   React.useEffect(() => {
-    if (isLoaded && xml && iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage(
-        JSON.stringify({
-          action: "load",
-          xml: xml,
-          autosave: 1,
-        }),
-        "*"
-      );
+    // Only reload if xml actually changed (not initial render)
+    if (isLoaded && xml && xml !== prevXmlRef.current && iframeRef.current?.contentWindow) {
+      prevXmlRef.current = xml;
+      console.log("[DrawioEmbed] Posting updated XML to iframe");
+      // Small delay to ensure iframe is ready to process
+      const timer = setTimeout(() => {
+        iframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({
+            action: "load",
+            xml: xml,
+            autosave: 1,
+          }),
+          "*"
+        );
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [xml, isLoaded]);
 
@@ -79,6 +82,8 @@ export function DrawioEmbed({
         // User saved/autosaved — get updated XML
         if (msg.event === "save" || msg.event === "autosave") {
           if (msg.xml && onXmlChange) {
+            xmlRef.current = msg.xml;
+            prevXmlRef.current = msg.xml;
             onXmlChange(msg.xml);
           }
         }
