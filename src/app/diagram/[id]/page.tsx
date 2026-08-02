@@ -367,7 +367,17 @@ export default function DiagramViewerPage() {
             <DrawioEmbed
               xml={diagramData.drawioXml}
               className="h-full w-full"
-              onXmlChange={(newXml) => { xmlRef.current = newXml; }}
+              onXmlChange={(newXml) => {
+                xmlRef.current = newXml;
+                // Persist iframe edits to sessionStorage
+                try {
+                  sessionStorage.setItem(`diagram_${diagramId}`, JSON.stringify({
+                    diagramId,
+                    drawioXml: newXml,
+                    name: diagramData.name,
+                  }));
+                } catch {}
+              }}
             />
           ) : (
             <div className="flex h-full items-center justify-center">
@@ -384,6 +394,26 @@ export default function DiagramViewerPage() {
               onArchitectureUpdate={(xml) => {
                 setDiagramData(prev => prev ? { ...prev, drawioXml: xml } : prev);
                 xmlRef.current = xml;
+                // Persist chatbot changes to sessionStorage and localStorage
+                try {
+                  sessionStorage.setItem(`diagram_${diagramId}`, JSON.stringify({
+                    diagramId,
+                    drawioXml: xml,
+                    name: diagramData.name,
+                  }));
+                } catch {}
+                try {
+                  const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]');
+                  const idx = drafts.findIndex((d: { diagramId: string }) => d.diagramId === diagramId);
+                  if (idx >= 0) {
+                    drafts[idx].xml = xml;
+                    drafts[idx].createdAt = new Date().toISOString();
+                  } else {
+                    drafts.unshift({ diagramId, name: diagramData.name, createdAt: new Date().toISOString(), xml });
+                    if (drafts.length > 20) drafts.pop();
+                  }
+                  localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
+                } catch {}
               }}
               className="h-full"
             />
