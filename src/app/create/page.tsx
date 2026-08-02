@@ -67,7 +67,8 @@ function CreateDiagramContent() {
       startGeneration();
 
       try {
-        const response = await fetch('/api/diagrams/generate', {
+        // Call API Gateway directly (bypasses Amplify 25s SSR timeout, Lambda has 29s)
+        const response = await fetch('https://kabcjmx4h3.execute-api.ap-south-2.amazonaws.com/api/diagrams/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

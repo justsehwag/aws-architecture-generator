@@ -746,6 +746,30 @@
         }
        ],
        "Sid": "S3DiagramFilesAccess"
+      },
+      {
+       "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:bedrock:*:",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           ":inference-profile/*"
+          ]
+         ]
+        },
+        "arn:aws:bedrock:*::foundation-model/anthropic.*",
+        "arn:aws:bedrock:*::foundation-model/amazon.*"
+       ],
+       "Sid": "BedrockInvokeModel"
       }
      ],
      "Version": "2012-10-17"
@@ -766,9 +790,9 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "94364667bedec5eb25284f82cfd832e050de9580f7818905b2a139ade9b1a2e5.zip"
+     "S3Key": "5bf4da14ba17200bcd56034545f4134191dcd4e9f03ccd370aab5b12511239b5.zip"
     },
-    "Description": "Processes natural language prompts via LLM and produces architecture specs",
+    "Description": "Processes natural language prompts via Bedrock and produces architecture specs",
     "Environment": {
      "Variables": {
       "DIAGRAMS_TABLE": {
@@ -788,7 +812,9 @@
       },
       "REGION": {
        "Ref": "AWS::Region"
-      }
+      },
+      "BEDROCK_MODEL_ID": "global.anthropic.claude-sonnet-4-6",
+      "BEDROCK_REGION": "ap-south-2"
      }
     },
     "FunctionName": "arch-generator-generate",
@@ -809,8 +835,8 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/GenerateLambda/Resource",
-    "aws:asset:path": "asset.94364667bedec5eb25284f82cfd832e050de9580f7818905b2a139ade9b1a2e5",
-    "aws:asset:is-bundled": false,
+    "aws:asset:path": "asset.5bf4da14ba17200bcd56034545f4134191dcd4e9f03ccd370aab5b12511239b5",
+    "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
   },
@@ -819,7 +845,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "5a2e4540327397b5a681c89b64a1a1706efe2a94cd9247e2d7e8281096feb3c4.zip"
+     "S3Key": "3cf93557a96e864b979865205ede818d13ae899991571857301bfc66296ba427.zip"
     },
     "Description": "Converts architecture specs to Draw.io XML via MCP server",
     "Environment": {
@@ -862,7 +888,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/RenderLambda/Resource",
-    "aws:asset:path": "asset.5a2e4540327397b5a681c89b64a1a1706efe2a94cd9247e2d7e8281096feb3c4",
+    "aws:asset:path": "asset.3cf93557a96e864b979865205ede818d13ae899991571857301bfc66296ba427",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -872,7 +898,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "c1addf1657d74f35166a46f3a8d31cbc532b61a61d29cc19ca16768f7ddcb959.zip"
+     "S3Key": "9106d0013d6215474eba82baa26fa8ba9cf1405a5347491a8ff846dae42152ac.zip"
     },
     "Description": "Evaluates architectures against Well-Architected Framework",
     "Environment": {
@@ -915,7 +941,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/AnalysisLambda/Resource",
-    "aws:asset:path": "asset.c1addf1657d74f35166a46f3a8d31cbc532b61a61d29cc19ca16768f7ddcb959",
+    "aws:asset:path": "asset.9106d0013d6215474eba82baa26fa8ba9cf1405a5347491a8ff846dae42152ac",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -925,7 +951,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "6108930e02a214d7d5716b88748c94810f49cb59cd06411b9755232cfb566202.zip"
+     "S3Key": "55c3179c5da921289b14f2fdf40617836011b3d4ab368048c3ee7c457872a07b.zip"
     },
     "Description": "Calculates estimated monthly costs for architecture services",
     "Environment": {
@@ -968,7 +994,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/CostLambda/Resource",
-    "aws:asset:path": "asset.6108930e02a214d7d5716b88748c94810f49cb59cd06411b9755232cfb566202",
+    "aws:asset:path": "asset.55c3179c5da921289b14f2fdf40617836011b3d4ab368048c3ee7c457872a07b",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -978,7 +1004,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "cb72f9cddeded77fb0893c6e42456faa2b54dd3820b1c343487ce58a49bfe1dd.zip"
+     "S3Key": "680428d43a41b7a29109a624be21033c08eedf57e57d4ffd5b91417aef22e80a.zip"
     },
     "Description": "Exports diagrams to PNG, SVG, PDF, JSON, Markdown formats",
     "Environment": {
@@ -1021,7 +1047,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/ExportLambda/Resource",
-    "aws:asset:path": "asset.cb72f9cddeded77fb0893c6e42456faa2b54dd3820b1c343487ce58a49bfe1dd",
+    "aws:asset:path": "asset.680428d43a41b7a29109a624be21033c08eedf57e57d4ffd5b91417aef22e80a",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1031,7 +1057,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "cf5f1f3103a0fd59d0bfa9a0f8d65e412eb900039f65f905255cbf5b062d6282.zip"
+     "S3Key": "12da59c142bd6d79f21f7e65e6b3a92e299df826489ed3f074f4d2a6bf147a15.zip"
     },
     "Description": "Generates Terraform, CDK, and CloudFormation code from diagrams",
     "Environment": {
@@ -1074,7 +1100,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/IaCLambda/Resource",
-    "aws:asset:path": "asset.cf5f1f3103a0fd59d0bfa9a0f8d65e412eb900039f65f905255cbf5b062d6282",
+    "aws:asset:path": "asset.12da59c142bd6d79f21f7e65e6b3a92e299df826489ed3f074f4d2a6bf147a15",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1084,7 +1110,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "254baa64e4987f0b2c1bfd42dbd8906764210d2dc63c07f8ab4d068439cf6407.zip"
+     "S3Key": "9b75f9cdd2473fb9c7212ffd75cad150ba73ca48e14c0644d963b28c9434c2ac.zip"
     },
     "Description": "Validates and imports .drawio files",
     "Environment": {
@@ -1127,7 +1153,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/ImportLambda/Resource",
-    "aws:asset:path": "asset.254baa64e4987f0b2c1bfd42dbd8906764210d2dc63c07f8ab4d068439cf6407",
+    "aws:asset:path": "asset.9b75f9cdd2473fb9c7212ffd75cad150ba73ca48e14c0644d963b28c9434c2ac",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1236,10 +1262,7 @@
     "ApiId": {
      "Ref": "ArchGeneratorApiF5BC7FDE"
     },
-    "AuthorizationType": "JWT",
-    "AuthorizerId": {
-     "Ref": "ArchGeneratorApiCognitoAuthorizerEAEE303F"
-    },
+    "AuthorizationType": "NONE",
     "RouteKey": "POST /api/diagrams/generate",
     "Target": {
      "Fn::Join": [
@@ -1255,44 +1278,6 @@
    },
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--generate/Resource"
-   }
-  },
-  "ArchGeneratorApiCognitoAuthorizerEAEE303F": {
-   "Type": "AWS::ApiGatewayV2::Authorizer",
-   "Properties": {
-    "ApiId": {
-     "Ref": "ArchGeneratorApiF5BC7FDE"
-    },
-    "AuthorizerType": "JWT",
-    "IdentitySource": [
-     "$request.header.Authorization"
-    ],
-    "JwtConfiguration": {
-     "Audience": [
-      {
-       "Ref": "ArchGeneratorUserPoolClientD8E9B6F2"
-      }
-     ],
-     "Issuer": {
-      "Fn::Join": [
-       "",
-       [
-        "https://cognito-idp.",
-        {
-         "Ref": "AWS::Region"
-        },
-        ".amazonaws.com/",
-        {
-         "Ref": "ArchGeneratorUserPoolD482F8D1"
-        }
-       ]
-      ]
-     }
-    },
-    "Name": "CognitoAuthorizer"
-   },
-   "Metadata": {
-    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/CognitoAuthorizer/Resource"
    }
   },
   "ArchGeneratorApiPOSTapidiagramsimportImportIntegration76DC1C01": {
@@ -1371,6 +1356,44 @@
    },
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/POST--api--diagrams--import/Resource"
+   }
+  },
+  "ArchGeneratorApiCognitoAuthorizerEAEE303F": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ArchGeneratorApiF5BC7FDE"
+    },
+    "AuthorizerType": "JWT",
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ],
+    "JwtConfiguration": {
+     "Audience": [
+      {
+       "Ref": "ArchGeneratorUserPoolClientD8E9B6F2"
+      }
+     ],
+     "Issuer": {
+      "Fn::Join": [
+       "",
+       [
+        "https://cognito-idp.",
+        {
+         "Ref": "AWS::Region"
+        },
+        ".amazonaws.com/",
+        {
+         "Ref": "ArchGeneratorUserPoolD482F8D1"
+        }
+       ]
+      ]
+     }
+    },
+    "Name": "CognitoAuthorizer"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/ArchGeneratorApi/CognitoAuthorizer/Resource"
    }
   },
   "ArchGeneratorApiGETapidiagramsidRenderIntegrationB3C91092": {
@@ -2295,7 +2318,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VRwY4aMQz9luUc0tUg7aG3WdCqewJBe6qqVSbjnRomCYodKI3y71WSAtOql578nv38bCeNbJ4W8vFBnWmu+8N8xE7GHSt9EOpMb1G7wSI7Gb8Q+I1zo1i+2xu+guWIYHla+p250pUzCu1UUDNJ0ELG56APUNor+hpnBn+gnX2cTffKC9FClhLJKm0DuxWMwLDu9qCZZumbqKWNG1Ff7q6V/4d3bdixYjBgp9bPiiAJPbrQv3tnWca1xwFtqzUQvfZgGbmMXmbNS9b8U7FCYo9dYHTldaY8if5ilXF9J+Nn1Y2QBQUkgcrIuHU1V+L92oqSGJXpeiXjS7D66j/FG/AGicokWrwpImCSbQ5CHXFQDGd1OTUyfmI+tkfMTTlkumM1lOEV5NTWBa7o1TIMXl0H/UXvujbwd+fxJ/hifWMpiWUgdmYL5ILX9cob/qO08e6EPfj8JaIsnzdCO4hp8zrwMXAS1vUg9/Th1DzJRj4+7Alx7oNlNCC3Nf4CopLIQxMDAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VRwW7bMAz9luasaIUD9NCb66BYL02QbKdhCGSZ8ZjYUiBSyTLB/z5Iahxv2GUnvkc+PlJUIYunhXx8UBea6+Y477CWYctKH4W60C5o2xpkK8NXAre2thPV3oz4BqoOwfC09JG50aXtFZqpIGcGQQsZXrw+QmrP6FuY9fgTzex5Nt0rLkQLmUoks7T0bJfQAcOqPoBmmg3fRS6tbYf6enfN/D+8c8OWFUMPZmr9oggGoTvrm72zhmVYOWzRlFoD0VsDhpHT6CpqXqPmn4olEjusPaNN15nyQTRXo3rb1DJ8UXUHUZDAIFD1MmxszqV4f21Gg+hUXzdqZ2wDB5LvKbx6o9MsWuwUETDJMoYPsQzV3oyaEURTcD0SpbXUCVvFcFHXcyHDZ+ZTecIoiiHSLas2bZZBTG2s54zeDEPr1M34L3rXlZ5/WIe/wCXrkQ2DqDyx7TdA1judTzDiP0prZ8/YgIv/JdJD40ZoWjFtXnk+eR5EvJQ80Kdz8SQL+fhwIMS584axB7nJ8TchxY3nMAMAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/CDKMetadata/Default"

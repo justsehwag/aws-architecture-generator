@@ -3,6 +3,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as lambdaNodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigatewayv2Authorizers from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import * as apigatewayv2Integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
@@ -254,20 +255,27 @@ export class ArchGeneratorStack extends cdk.Stack {
       },
     };
 
-    // Generate Lambda - Prompt processing and LLM interaction
-    const generateFn = new lambda.Function(this, 'GenerateLambda', {
-      ...commonLambdaProps,
+    // Generate Lambda - Prompt processing and LLM interaction (uses NodejsFunction for TypeScript compilation)
+    const generateFn = new lambdaNodejs.NodejsFunction(this, 'GenerateLambda', {
       functionName: 'arch-generator-generate',
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset('lambda/generate'),
-      description: 'Processes natural language prompts via LLM and produces architecture specs',
+      entry: 'lambda/generate/index.ts',
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_22_X,
+      timeout: cdk.Duration.seconds(29),
       memorySize: 1024,
+      role: lambdaExecutionRole,
       environment: {
-        ...commonLambdaProps.environment,
+        ...commonLambdaProps.environment as Record<string, string>,
         BEDROCK_MODEL_ID: 'global.anthropic.claude-sonnet-4-6',
         BEDROCK_REGION: 'ap-south-2',
       },
-    } as lambda.FunctionProps);
+      bundling: {
+        minify: false,
+        sourceMap: true,
+        externalModules: [],
+      },
+      description: 'Processes natural language prompts via Bedrock and produces architecture specs',
+    });
 
     // Grant Generate Lambda permission to invoke Bedrock models
     generateFn.addToRolePolicy(
