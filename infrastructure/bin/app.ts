@@ -8,7 +8,7 @@ const app = new cdk.App();
 new ArchGeneratorStack(app, 'ArchGeneratorStack', {
   env: {
     account: '915233244358',
-    region: 'ap-south-2',
+    region: 'ap-south-1',
   },
   description: 'AWS Architecture Generator - Serverless deployment infrastructure',
 });

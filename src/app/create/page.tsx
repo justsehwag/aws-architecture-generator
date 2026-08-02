@@ -9,6 +9,7 @@ import { GenerationProgress } from '@/components/create/GenerationProgress';
 import { GenerationError } from '@/components/create/GenerationError';
 import { useGenerationState } from '@/hooks/useGenerationState';
 import { useTemplates } from '@/hooks/useTemplates';
+import { useDrawioGenerator } from '@/hooks/useDrawioGenerator';
 import {
   createApiError,
   createParseError,
@@ -40,6 +41,16 @@ function CreateDiagramContent() {
 
   const { templates, isLoading: templatesLoading, getTemplateById } = useTemplates();
 
+  // New Draw.io Generator hook (Lambda Function URL - primary generation method)
+  const {
+    generate: generateDrawio,
+    drawioXml,
+    diagramId: drawioId,
+    isGenerating: isDrawioGenerating,
+    error: drawioError,
+    reset: resetDrawio,
+  } = useDrawioGenerator();
+
   const [generationError, setGenerationError] = React.useState<GenerationErrorData | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | null>(
     templateParam
@@ -56,48 +67,104 @@ function CreateDiagramContent() {
 
   const selectedTemplate = selectedTemplateId ? getTemplateById(selectedTemplateId) : null;
 
+  // Watch for successful generation from the drawio generator hook
+  useEffect(() => {
+    if (drawioXml && drawioId) {
+      // Store in session storage for the diagram viewer page
+      try {
+        sessionStorage.setItem(`diagram_${drawioId}`, JSON.stringify({
+          diagramId: drawioId,
+          drawioXml,
+        }));
+      } catch {}
+      setStep('generating-diagram');
+      setStep('analyzing');
+      setReady();
+      router.push(`/diagram/${drawioId}`);
+    }
+  }, [drawioXml, drawioId, router, setStep, setReady]);
+
+  // Handle errors from the drawio generator hook
+  useEffect(() => {
+    if (drawioError) {
+      let mappedError: GenerationErrorData;
+
+      switch (drawioError.code) {
+        case 'TIMEOUT':
+          mappedError = createTimeoutError();
+          break;
+        case 'NETWORK_ERROR':
+          mappedError = createNetworkError();
+          break;
+        case 'SERVICE_NOT_CONFIGURED':
+          mappedError = createApiError(503);
+          break;
+        case 'MODEL_ACCESS_DENIED':
+          mappedError = createApiError(503);
+          break;
+        case 'INVALID_PROMPT':
+          mappedError = createApiError(400);
+          break;
+        case 'INVALID_XML':
+          mappedError = createApiError(422);
+          break;
+        case 'LLM_ERROR':
+          mappedError = createApiError(502);
+          break;
+        default:
+          mappedError = createApiError(500);
+          break;
+      }
+
+      setError({ message: drawioError.error });
+      setGenerationError(mappedError);
+    }
+  }, [drawioError, setError]);
+
   /**
    * Handles the diagram generation flow.
-   * Calls the Amplify SSR API route for generation.
+   * Uses the Lambda Function URL endpoint via useDrawioGenerator hook (primary method).
    */
   const handleGenerate = useCallback(
     async (prompt: string) => {
       setLastPrompt(prompt);
       setGenerationError(null);
+      resetDrawio();
       startGeneration();
 
-      try {
-        // Use synchronous generation (Haiku responds within 15s)
-        const response = await fetch('/api/diagrams/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt }),
-        });
+      // Primary generation method: Lambda Function URL via useDrawioGenerator hook
+      await generateDrawio(prompt);
 
-        if (!response.ok) {
-          const body = await response.json().catch(() => ({})) as Record<string, unknown>;
-          const apiError = createApiError(response.status);
-          setError({ message: (body.error as string) || apiError.message });
-          setGenerationError(apiError);
-          return;
-        }
-
-        const data = await response.json();
-        setStep('generating-diagram');
-        setStep('analyzing');
-        setReady();
-
-        if (data.diagramId) {
-          try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
-          router.push(`/diagram/${data.diagramId}`);
-        }
-      } catch {
-        const networkError = createNetworkError();
-        setError({ message: networkError.message });
-        setGenerationError(networkError);
-      }
+      // Note: Success/error handling is done via useEffect watchers on drawioXml/drawioError
+      // The old /api/diagrams/generate route is kept below as a fallback reference:
+      // try {
+      //   const response = await fetch('/api/diagrams/generate', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({ prompt }),
+      //   });
+      //   if (!response.ok) {
+      //     const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+      //     const apiError = createApiError(response.status);
+      //     setError({ message: (body.error as string) || apiError.message });
+      //     setGenerationError(apiError);
+      //     return;
+      //   }
+      //   const data = await response.json();
+      //   setStep('generating-diagram');
+      //   setStep('analyzing');
+      //   setReady();
+      //   if (data.diagramId) {
+      //     try { sessionStorage.setItem(`diagram_${data.diagramId}`, JSON.stringify(data)); } catch {}
+      //     router.push(`/diagram/${data.diagramId}`);
+      //   }
+      // } catch {
+      //   const networkError = createNetworkError();
+      //   setError({ message: networkError.message });
+      //   setGenerationError(networkError);
+      // }
     },
-    [selectedTemplateId, startGeneration, setStep, setReady, setError, router]
+    [startGeneration, generateDrawio, resetDrawio]
   );
 
   /**
@@ -108,9 +175,10 @@ function CreateDiagramContent() {
     setIsRetrying(true);
     setGenerationError(null);
     reset();
+    resetDrawio();
     await handleGenerate(lastPrompt);
     setIsRetrying(false);
-  }, [lastPrompt, reset, handleGenerate]);
+  }, [lastPrompt, reset, resetDrawio, handleGenerate]);
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -206,12 +274,12 @@ function CreateDiagramContent() {
         </h2>
         <PromptInput
           onGenerate={handleGenerate}
-          isGenerating={isProcessing}
+          isGenerating={isDrawioGenerating || isProcessing}
         />
       </section>
 
       {/* Generation Progress */}
-      {isProcessing && (
+      {(isDrawioGenerating || isProcessing) && (
         <GenerationProgress state={state} />
       )}
 

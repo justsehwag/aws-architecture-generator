@@ -291,6 +291,47 @@ export class ArchGeneratorStack extends cdk.Stack {
       })
     );
 
+    // ============================================================
+    // Draw.io Generator Lambda (Function URL, no API Gateway)
+    // ============================================================
+
+    const drawioGeneratorFn = new lambdaNodejs.NodejsFunction(this, 'DrawioGeneratorLambda', {
+      functionName: 'arch-generator-drawio',
+      entry: 'lambda/drawio-generator/index.ts',
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_22_X,
+      timeout: cdk.Duration.seconds(900),
+      memorySize: 1024,
+      environment: {
+        BEDROCK_MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
+        BEDROCK_REGION: 'us-east-1',
+      },
+      bundling: {
+        minify: false,
+        sourceMap: true,
+        externalModules: [],
+      },
+      description: 'Generates Draw.io XML directly from architecture prompts via Bedrock Claude Sonnet',
+    });
+
+    // Grant Draw.io Generator Lambda permission to invoke Bedrock models
+    drawioGeneratorFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+        resources: ['arn:aws:bedrock:*::foundation-model/anthropic.*'],
+      })
+    );
+
+    // Function URL with CORS
+    const drawioFunctionUrl = drawioGeneratorFn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: ['*'],
+        allowedMethods: [lambda.HttpMethod.POST],
+        allowedHeaders: ['Content-Type'],
+      },
+    });
+
     // Render Lambda - Draw.io MCP diagram rendering
     const renderFn = new lambda.Function(this, 'RenderLambda', {
       ...commonLambdaProps,
@@ -473,6 +514,11 @@ export class ArchGeneratorStack extends cdk.Stack {
     // ============================================================
     // Stack Outputs
     // ============================================================
+
+    new cdk.CfnOutput(this, 'DrawioGeneratorFunctionUrl', {
+      value: drawioFunctionUrl.url,
+      description: 'Function URL for the Draw.io XML generator Lambda',
+    });
 
     new cdk.CfnOutput(this, 'DistributionDomainName', {
       value: distribution.distributionDomainName,

@@ -14,6 +14,20 @@
       "data": true
     }
   ],
+  "/ArchGeneratorStack/DrawioGeneratorFunctionUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorFunctionUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:518:5)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
   "/ArchGeneratorStack/DistributionDomainName": [
     {
       "type": "aws:cdk:logicalId",
@@ -22,7 +36,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:477:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:523:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -36,7 +50,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:482:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:528:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -50,7 +64,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:487:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:533:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -64,7 +78,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:492:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:538:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -78,7 +92,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:497:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:543:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -92,7 +106,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:502:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:548:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -106,7 +120,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:553:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -120,7 +134,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:512:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:558:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -134,7 +148,7 @@
     {
       "type": "aws:cdk:creationStack",
       "data": [
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:517:5)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:563:5)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -378,6 +392,51 @@
       ]
     }
   ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambda6BC0B4AF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new NodejsFunction in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:298:31)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/invoke-function-url": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambdainvokefunctionurlEAF52DC5"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:326:49)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/invoke-function": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambdainvokefunctionC3EC80FE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:326:49)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
   "/ArchGeneratorStack/RenderLambda/Resource": [
     {
       "type": "aws:cdk:logicalId",
@@ -387,7 +446,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:295:22)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:336:22)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -402,7 +461,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:305:24)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:346:24)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -417,7 +476,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:314:20)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:355:20)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -432,7 +491,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:323:22)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:364:22)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -447,7 +506,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:333:19)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:374:19)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -462,7 +521,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new Function2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:342:22)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:383:22)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -477,7 +536,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new HttpApi2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:354:21)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:395:21)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -545,6 +604,36 @@
       ]
     }
   ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambdaServiceRoleBBB96F20"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new NodejsFunction in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:298:31)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/FunctionUrl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambdaFunctionUrlE087DDD1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addFunctionUrl in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:326:49)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
   "/ArchGeneratorStack/ArchGeneratorApi/DefaultStage/Resource": [
     {
       "type": "aws:cdk:logicalId",
@@ -554,7 +643,7 @@
       "type": "aws:cdk:creationStack",
       "data": [
         "...new HttpApi2 in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:354:21)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:395:21)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node, ts-node..."
       ]
@@ -571,7 +660,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:395:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:436:13)"
       ]
     }
   ],
@@ -586,7 +675,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:395:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:436:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -603,7 +692,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:402:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:443:13)"
       ]
     }
   ],
@@ -618,7 +707,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:402:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:443:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -635,7 +724,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:402:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:443:13)"
       ]
     }
   ],
@@ -650,7 +739,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)"
       ]
     }
   ],
@@ -665,7 +754,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -682,7 +771,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)"
       ]
     }
   ],
@@ -697,7 +786,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -714,7 +803,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)"
       ]
     }
   ],
@@ -729,7 +818,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -746,7 +835,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:418:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:459:13)"
       ]
     }
   ],
@@ -761,7 +850,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:418:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:459:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -778,7 +867,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:418:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:459:13)"
       ]
     }
   ],
@@ -793,7 +882,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:418:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:459:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -810,7 +899,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:426:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:467:13)"
       ]
     }
   ],
@@ -825,7 +914,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:426:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:467:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -842,7 +931,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:434:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:475:13)"
       ]
     }
   ],
@@ -857,7 +946,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:434:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:475:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -874,7 +963,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:442:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:483:13)"
       ]
     }
   ],
@@ -889,7 +978,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:442:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:483:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -906,7 +995,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:450:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:13)"
       ]
     }
   ],
@@ -921,7 +1010,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:450:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -938,7 +1027,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:450:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:13)"
       ]
     }
   ],
@@ -953,7 +1042,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:450:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -970,7 +1059,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:458:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:499:13)"
       ]
     }
   ],
@@ -985,7 +1074,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:458:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:499:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -1002,7 +1091,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:13)"
       ]
     }
   ],
@@ -1017,7 +1106,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:13)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -1034,7 +1123,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:13)"
       ]
     }
   ],
@@ -1049,7 +1138,22 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:13)",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:13)",
+        "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/ArchGeneratorStack/DrawioGeneratorLambda/ServiceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DrawioGeneratorLambdaServiceRoleDefaultPolicy7AD3F541"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...NodejsFunction.addToRolePolicy in aws-cdk-lib...",
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:318:23)",
         "<anonymous> (C:\\AWS ARCH\\infrastructure\\bin\\app.ts:8:1)",
         "...node internals, ts-node..."
       ]
@@ -1066,7 +1170,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:395:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:436:13)"
       ]
     }
   ],
@@ -1081,7 +1185,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:402:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:443:13)"
       ]
     }
   ],
@@ -1096,7 +1200,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:410:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:451:13)"
       ]
     }
   ],
@@ -1111,7 +1215,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:418:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:459:13)"
       ]
     }
   ],
@@ -1126,7 +1230,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:426:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:467:13)"
       ]
     }
   ],
@@ -1141,7 +1245,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:434:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:475:13)"
       ]
     }
   ],
@@ -1156,7 +1260,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:442:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:483:13)"
       ]
     }
   ],
@@ -1171,7 +1275,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:450:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:491:13)"
       ]
     }
   ],
@@ -1186,7 +1290,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:458:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:499:13)"
       ]
     }
   ],
@@ -1201,7 +1305,7 @@
         "...C:\\AWS ARCH\\infrastructure\\node_modules\\aws-cdk-lib\\aws-apigatewayv2\\lib\\http\\api.js:1:96 in aws-cdk-lib...",
         "Array.map (:)",
         "...WrappedClass.<anonymous> in aws-cdk-lib...",
-        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:466:13)"
+        "new ArchGeneratorStack (C:\\AWS ARCH\\infrastructure\\lib\\arch-generator-stack.ts:507:13)"
       ]
     }
   ]

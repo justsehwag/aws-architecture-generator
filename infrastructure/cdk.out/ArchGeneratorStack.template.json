@@ -306,7 +306,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
     },
     "Timeout": 900,
@@ -789,8 +789,8 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
-     "S3Key": "5bf4da14ba17200bcd56034545f4134191dcd4e9f03ccd370aab5b12511239b5.zip"
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
+     "S3Key": "4935129e019d6797c70dd5c9852e31fd16233c43650de09faa930e0ff535d481.zip"
     },
     "Description": "Processes natural language prompts via Bedrock and produces architecture specs",
     "Environment": {
@@ -835,16 +835,174 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/GenerateLambda/Resource",
-    "aws:asset:path": "asset.5bf4da14ba17200bcd56034545f4134191dcd4e9f03ccd370aab5b12511239b5",
+    "aws:asset:path": "asset.4935129e019d6797c70dd5c9852e31fd16233c43650de09faa930e0ff535d481",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
+   }
+  },
+  "DrawioGeneratorLambdaServiceRoleBBB96F20": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/ServiceRole/Resource"
+   }
+  },
+  "DrawioGeneratorLambdaServiceRoleDefaultPolicy7AD3F541": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:bedrock:*::foundation-model/anthropic.*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DrawioGeneratorLambdaServiceRoleDefaultPolicy7AD3F541",
+    "Roles": [
+     {
+      "Ref": "DrawioGeneratorLambdaServiceRoleBBB96F20"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DrawioGeneratorLambda6BC0B4AF": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
+     "S3Key": "b5d86b1314732d587e42bafb72c551ff818d7369fa9fc440aae4650f940729f5.zip"
+    },
+    "Description": "Generates Draw.io XML directly from architecture prompts via Bedrock Claude Sonnet",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "BEDROCK_REGION": "us-east-1"
+     }
+    },
+    "FunctionName": "arch-generator-drawio",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "DrawioGeneratorLambdaServiceRoleBBB96F20",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "DrawioGeneratorLambdaServiceRoleDefaultPolicy7AD3F541",
+    "DrawioGeneratorLambdaServiceRoleBBB96F20"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/Resource",
+    "aws:asset:path": "asset.b5d86b1314732d587e42bafb72c551ff818d7369fa9fc440aae4650f940729f5",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "DrawioGeneratorLambdaFunctionUrlE087DDD1": {
+   "Type": "AWS::Lambda::Url",
+   "Properties": {
+    "AuthType": "NONE",
+    "Cors": {
+     "AllowHeaders": [
+      "Content-Type"
+     ],
+     "AllowMethods": [
+      "POST"
+     ],
+     "AllowOrigins": [
+      "*"
+     ]
+    },
+    "TargetFunctionArn": {
+     "Fn::GetAtt": [
+      "DrawioGeneratorLambda6BC0B4AF",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/FunctionUrl/Resource"
+   }
+  },
+  "DrawioGeneratorLambdainvokefunctionurlEAF52DC5": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunctionUrl",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DrawioGeneratorLambda6BC0B4AF",
+      "Arn"
+     ]
+    },
+    "FunctionUrlAuthType": "NONE",
+    "Principal": "*"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/invoke-function-url"
+   }
+  },
+  "DrawioGeneratorLambdainvokefunctionC3EC80FE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DrawioGeneratorLambda6BC0B4AF",
+      "Arn"
+     ]
+    },
+    "InvokedViaFunctionUrl": true,
+    "Principal": "*"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/invoke-function"
    }
   },
   "RenderLambdaE2D96199": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "3cf93557a96e864b979865205ede818d13ae899991571857301bfc66296ba427.zip"
     },
     "Description": "Converts architecture specs to Draw.io XML via MCP server",
@@ -897,7 +1055,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "9106d0013d6215474eba82baa26fa8ba9cf1405a5347491a8ff846dae42152ac.zip"
     },
     "Description": "Evaluates architectures against Well-Architected Framework",
@@ -950,7 +1108,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "55c3179c5da921289b14f2fdf40617836011b3d4ab368048c3ee7c457872a07b.zip"
     },
     "Description": "Calculates estimated monthly costs for architecture services",
@@ -1003,7 +1161,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "680428d43a41b7a29109a624be21033c08eedf57e57d4ffd5b91417aef22e80a.zip"
     },
     "Description": "Exports diagrams to PNG, SVG, PDF, JSON, Markdown formats",
@@ -1056,7 +1214,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "12da59c142bd6d79f21f7e65e6b3a92e299df826489ed3f074f4d2a6bf147a15.zip"
     },
     "Description": "Generates Terraform, CDK, and CloudFormation code from diagrams",
@@ -1109,7 +1267,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-2",
+     "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
      "S3Key": "9b75f9cdd2473fb9c7212ffd75cad150ba73ca48e14c0644d963b28c9434c2ac.zip"
     },
     "Description": "Validates and imports .drawio files",
@@ -1243,7 +1401,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1318,7 +1476,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1434,7 +1592,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1493,7 +1651,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1552,7 +1710,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1630,7 +1788,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1689,7 +1847,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1767,7 +1925,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1845,7 +2003,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -1923,7 +2081,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2001,7 +2159,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2060,7 +2218,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2138,7 +2296,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2216,7 +2374,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2275,7 +2433,7 @@
        {
         "Ref": "AWS::Partition"
        },
-       ":execute-api:ap-south-2:915233244358:",
+       ":execute-api:ap-south-1:915233244358:",
        {
         "Ref": "ArchGeneratorApiF5BC7FDE"
        },
@@ -2318,7 +2476,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VRwW7bMAz9luasaIUD9NCb66BYL02QbKdhCGSZ8ZjYUiBSyTLB/z5Iahxv2GUnvkc+PlJUIYunhXx8UBea6+Y477CWYctKH4W60C5o2xpkK8NXAre2thPV3oz4BqoOwfC09JG50aXtFZqpIGcGQQsZXrw+QmrP6FuY9fgTzex5Nt0rLkQLmUoks7T0bJfQAcOqPoBmmg3fRS6tbYf6enfN/D+8c8OWFUMPZmr9oggGoTvrm72zhmVYOWzRlFoD0VsDhpHT6CpqXqPmn4olEjusPaNN15nyQTRXo3rb1DJ8UXUHUZDAIFD1MmxszqV4f21Gg+hUXzdqZ2wDB5LvKbx6o9MsWuwUETDJMoYPsQzV3oyaEURTcD0SpbXUCVvFcFHXcyHDZ+ZTecIoiiHSLas2bZZBTG2s54zeDEPr1M34L3rXlZ5/WIe/wCXrkQ2DqDyx7TdA1judTzDiP0prZ8/YgIv/JdJD40ZoWjFtXnk+eR5EvJQ80Kdz8SQL+fhwIMS584axB7nJ8TchxY3nMAMAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/5VRTW8aMRD9LeFs3GiRcuhtA4qaS0HQnKoKeb3DdmDXRp4xlFr+75XtAJuql57eezNvPjyuZPU0k48P6kxT3R6mPTYybFjpg1Bn2gZtO4NsZXgjcCtrezHfmRu/knmPYHiceo9c5cIOCs3YUCJR0EyGZ68PkMsL+x4mA/5CM/k8Ge+VFqKZzCmSxVp7tgvogWHZ7EEzTeIPUVIr26O+3LsW/R+9S8GGFcMAZtz6WRFEoXvr252zhmVYOuzQ1FoD0WsLhpHz6HnyvCTPPx0LJHbYeEabrzPWUbQXowbbNjJ8U00PyZBJFKgGGda2xDLeX1tYFL0amlZtjW1hT/JrhhdvdJ5Fs60iAiZZJ3g3yzDfmZvnSt5c+fUCK3ADEo0NUagjdorhrC6nSoYvzMf6iMmdIMkNqy4vW0gKra3nwl4NQ+fU9Qh/ybuv9vzTOvwNLre+qRjF3BPbYQ1kvdPlKjf+IbVy9oQtuPSFIr89bYSmE+Pipeej5yjS8eSePp2qJ1nJx4c9IU6dN4wDyHXBP93wWdVDAwAA"
    },
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/CDKMetadata/Default"
@@ -2326,6 +2484,15 @@
   }
  },
  "Outputs": {
+  "DrawioGeneratorFunctionUrl": {
+   "Description": "Function URL for the Draw.io XML generator Lambda",
+   "Value": {
+    "Fn::GetAtt": [
+     "DrawioGeneratorLambdaFunctionUrlE087DDD1",
+     "FunctionUrl"
+    ]
+   }
+  },
   "DistributionDomainName": {
    "Description": "CloudFront distribution domain name for the frontend",
    "Value": {
