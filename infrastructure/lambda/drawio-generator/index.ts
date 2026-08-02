@@ -49,7 +49,7 @@ const MAX_RETRIES = 2; // 3 total attempts (1 initial + 2 retries)
 const REQUEST_TIMEOUT_MS = 60_000; // 60 seconds per attempt
 
 const MIN_PROMPT_LENGTH = 10;
-const MAX_PROMPT_LENGTH = 5000;
+const MAX_PROMPT_LENGTH = 50000; // Increased to support chat context with existing XML
 
 // ============================================================
 // Bedrock Client (initialized outside handler for warm starts)
