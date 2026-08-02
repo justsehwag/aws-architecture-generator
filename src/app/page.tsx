@@ -10,8 +10,21 @@ import {
   Clock,
   Layers,
   ArrowRight,
+  Trash2,
+  RotateCcw,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { useDashboard } from "@/hooks/useDashboard";
+import {
+  softDeleteDiagram,
+  restoreDiagram,
+  permanentlyDeleteDiagram,
+  purgeExpiredDiagrams,
+  getDeletedDiagrams,
+  getDaysUntilExpiry,
+  type DeletedDiagram,
+} from "@/utils/deleted-diagrams";
 
 /**
  * Quick-start templates shown on the Dashboard.
@@ -77,6 +90,31 @@ function formatRelativeTime(dateStr: string): string {
  */
 export default function DashboardPage() {
   const { recentDiagrams, stats, isLoading, error, refresh } = useDashboard();
+  const [deletedDiagrams, setDeletedDiagrams] = React.useState<DeletedDiagram[]>([]);
+  const [deletedOpen, setDeletedOpen] = React.useState(false);
+
+  // Purge expired and load deleted diagrams on mount
+  React.useEffect(() => {
+    purgeExpiredDiagrams();
+    setDeletedDiagrams(getDeletedDiagrams());
+  }, []);
+
+  const handleSoftDelete = (diagramId: string) => {
+    softDeleteDiagram(diagramId);
+    setDeletedDiagrams(getDeletedDiagrams());
+    refresh();
+  };
+
+  const handleRestore = (diagramId: string) => {
+    restoreDiagram(diagramId);
+    setDeletedDiagrams(getDeletedDiagrams());
+    refresh();
+  };
+
+  const handlePermanentDelete = (diagramId: string) => {
+    permanentlyDeleteDiagram(diagramId);
+    setDeletedDiagrams(getDeletedDiagrams());
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
@@ -169,31 +207,106 @@ export default function DashboardPage() {
         ) : (
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {recentDiagrams.map((diagram) => (
-              <Link
+              <div
                 key={diagram.diagramId}
-                href={`/diagram/${diagram.diagramId}`}
-                className="group rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group relative rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
               >
-                <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm font-medium text-card-foreground group-hover:text-primary">
-                      {diagram.name}
-                    </h3>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" aria-hidden="true" />
-                      <span>{formatRelativeTime(diagram.updatedAt)}</span>
+                <Link
+                  href={`/diagram/${diagram.diagramId}`}
+                  className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-medium text-card-foreground group-hover:text-primary">
+                        {diagram.name}
+                      </h3>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" aria-hidden="true" />
+                        <span>{formatRelativeTime(diagram.updatedAt)}</span>
+                      </div>
                     </div>
+                    <span className="ml-2 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                      {diagram.serviceCount}{" "}
+                      {diagram.serviceCount === 1 ? "service" : "services"}
+                    </span>
                   </div>
-                  <span className="ml-2 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                    {diagram.serviceCount}{" "}
-                    {diagram.serviceCount === 1 ? "service" : "services"}
-                  </span>
-                </div>
-              </Link>
+                </Link>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSoftDelete(diagram.diagramId);
+                  }}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                  aria-label={`Delete ${diagram.name}`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             ))}
           </div>
         )}
       </section>
+
+      {/* Deleted Diagrams Section */}
+      {deletedDiagrams.length > 0 && (
+        <section aria-labelledby="deleted-heading">
+          <button
+            onClick={() => setDeletedOpen(!deletedOpen)}
+            className="flex items-center gap-2 text-xl font-semibold text-foreground hover:text-primary transition-colors"
+            aria-expanded={deletedOpen}
+            aria-controls="deleted-list"
+          >
+            {deletedOpen ? (
+              <ChevronDown className="h-5 w-5" />
+            ) : (
+              <ChevronRight className="h-5 w-5" />
+            )}
+            <h2 id="deleted-heading">Deleted ({deletedDiagrams.length})</h2>
+          </button>
+
+          {deletedOpen && (
+            <div id="deleted-list" className="mt-4 space-y-2">
+              {deletedDiagrams.map((diagram) => {
+                const daysLeft = getDaysUntilExpiry(diagram);
+                return (
+                  <div
+                    key={diagram.diagramId}
+                    className="flex items-center justify-between rounded-lg border border-border bg-card/50 p-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-muted-foreground">
+                        {diagram.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Deleted {new Date(diagram.deletedAt).toLocaleDateString()} · Expires in {daysLeft} day{daysLeft !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 ml-3">
+                      <button
+                        onClick={() => handleRestore(diagram.diagramId)}
+                        className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        aria-label={`Restore ${diagram.name}`}
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Restore
+                      </button>
+                      <button
+                        onClick={() => handlePermanentDelete(diagram.diagramId)}
+                        className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                        aria-label={`Permanently delete ${diagram.name}`}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Quick Start Templates Section */}
       <section aria-labelledby="templates-heading">

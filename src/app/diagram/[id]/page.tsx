@@ -380,9 +380,8 @@ export default function DiagramViewerPage() {
         {chatOpen && (
           <aside className="w-80 flex-shrink-0 lg:w-96">
             <DiagramChat
-              architectureSpec={(() => { try { const c = sessionStorage.getItem(`diagram_${diagramId}`); return c ? JSON.parse(c).architectureSpec : null; } catch { return null; } })()}
               currentXml={diagramData.drawioXml}
-              onArchitectureUpdate={(_spec, xml) => {
+              onArchitectureUpdate={(xml) => {
                 setDiagramData(prev => prev ? { ...prev, drawioXml: xml } : prev);
                 xmlRef.current = xml;
               }}

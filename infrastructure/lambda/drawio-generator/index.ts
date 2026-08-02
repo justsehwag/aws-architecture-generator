@@ -133,21 +133,27 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Invokes Bedrock with the given prompt, with retry logic.
+ * Invokes Bedrock with the given messages array, with retry logic.
  * - Max 3 total attempts (1 initial + 2 retries)
  * - Exponential backoff: 1s, 2s between retryable failures
  * - Immediate throw on AccessDeniedException or model not found
  * - 60-second timeout per attempt via Promise.race
+ * - If modelId is provided, uses it instead of the default BEDROCK_MODEL_ID
  *
  * Validates: Requirements 2.1, 2.4, 2.5, 2.6, 2.7, 5.2, 5.4
  */
-export async function callBedrockWithRetry(prompt: string): Promise<string> {
+export async function callBedrockWithRetry(
+  messages: Array<{ role: string; content: string }>,
+  modelId?: string
+): Promise<string> {
+  const resolvedModelId = modelId || BEDROCK_MODEL_ID;
+
   const requestBody = JSON.stringify({
     anthropic_version: 'bedrock-2023-05-31',
     max_tokens: 16384,
     temperature: 0.2,
     system: buildSystemPrompt(),
-    messages: [{ role: 'user', content: prompt }],
+    messages,
   });
 
   let lastError: Error | undefined;
@@ -155,7 +161,7 @@ export async function callBedrockWithRetry(prompt: string): Promise<string> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       const command = new InvokeModelCommand({
-        modelId: BEDROCK_MODEL_ID,
+        modelId: resolvedModelId,
         contentType: 'application/json',
         accept: 'application/json',
         body: requestBody,
@@ -299,17 +305,60 @@ export function validateDrawioXml(xml: string): boolean {
 // ============================================================
 
 /**
+ * Maximum total character length for conversation context sent to Bedrock.
+ * If conversationHistory + currentXml + prompt exceeds this, oldest history messages are truncated.
+ */
+const MAX_CONTEXT_CHARS = 180_000;
+
+/**
  * Generates a Draw.io XML diagram from the given prompt using Bedrock.
+ * Assembles the full messages array server-side from currentXml, conversationHistory, and prompt.
  * Calls Bedrock with retry logic, extracts and validates the XML response.
  *
  * Validates: Requirements 2.1, 2.3, 2.8, 2.9, 3.9, 4.5, 5.1, 5.2, 5.3, 5.5
  */
 async function generateDiagram(
   prompt: string,
-  requestId: string
+  requestId: string,
+  conversationHistory?: Array<{ role: string; content: string }>,
+  currentXml?: string,
+  modelId?: string
 ): Promise<LambdaFunctionURLResponse> {
   try {
-    const llmResponse = await callBedrockWithRetry(prompt);
+    // Assemble messages array for Bedrock
+    const messages: Array<{ role: string; content: string }> = [];
+
+    // If currentXml is provided, add it as the first user message with context framing
+    if (currentXml) {
+      messages.push({
+        role: 'user',
+        content: `Here is the current Draw.io XML diagram:\n\n${currentXml}\n\nPlease modify it based on the following instruction.`,
+      });
+      // Add a placeholder assistant acknowledgment to maintain alternating roles
+      messages.push({
+        role: 'assistant',
+        content: 'I understand. I have the current diagram XML. Please provide your instruction.',
+      });
+    }
+
+    // Append conversation history if provided
+    if (conversationHistory && conversationHistory.length > 0) {
+      for (const msg of conversationHistory) {
+        messages.push({ role: msg.role, content: msg.content });
+      }
+    }
+
+    // Add the user's current prompt as the final message
+    messages.push({ role: 'user', content: prompt });
+
+    // Truncate oldest history messages if total context exceeds limit
+    const totalChars = () => messages.reduce((sum, m) => sum + m.content.length, 0);
+    while (totalChars() > MAX_CONTEXT_CHARS && messages.length > 1) {
+      // Remove the oldest message (but never remove the last user prompt)
+      messages.shift();
+    }
+
+    const llmResponse = await callBedrockWithRetry(messages, modelId);
 
     // Extract XML from the LLM response
     const extractedXml = extractDrawioXml(llmResponse);
@@ -449,7 +498,12 @@ export const handler = async (
   }
 
   // Validate prompt field
-  const { prompt } = body;
+  const { prompt, conversationHistory, currentXml, modelId } = body as {
+    prompt: unknown;
+    conversationHistory?: Array<{ role: string; content: string }>;
+    currentXml?: string;
+    modelId?: string;
+  };
 
   if (!prompt || typeof prompt !== 'string') {
     return errorResponse(
@@ -480,7 +534,13 @@ export const handler = async (
 
   // Generate diagram via Bedrock
   try {
-    return await generateDiagram(prompt, requestId);
+    return await generateDiagram(
+      prompt,
+      requestId,
+      conversationHistory,
+      currentXml as string | undefined,
+      modelId as string | undefined
+    );
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
     console.error('Unexpected error:', {

@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n";
 
 // --- Constants ---
@@ -30,8 +31,13 @@ const AWS_REGIONS = [
 ] as const;
 
 const LLM_MODELS = [
-  { value: "openai-gpt-4o", label: "OpenAI GPT-4o" },
-  { value: "claude-sonnet", label: "Claude Sonnet" },
+  { value: "us.anthropic.claude-sonnet-4-5-20250929-v1:0", label: "Claude Sonnet 4" },
+  { value: "us.anthropic.claude-3-5-haiku-20241022-v1:0", label: "Claude Haiku" },
+  { value: "us.anthropic.claude-opus-4-20250514-v1:0", label: "Claude Opus" },
+  { value: "us.amazon.nova-pro-v1:0", label: "Amazon Nova Pro" },
+  { value: "us.amazon.nova-lite-v1:0", label: "Amazon Nova Lite" },
+  { value: "us.meta.llama3-3-70b-instruct-v1:0", label: "Llama 3.3" },
+  { value: "us.mistral.mistral-large-2411-v1:0", label: "Mistral Large" },
 ] as const;
 
 const KEYBOARD_SHORTCUTS = [
@@ -102,10 +108,64 @@ export default function SettingsPage() {
   const [settings, setSettings] = React.useState<AppSettings>(loadSettings);
   const [mounted, setMounted] = React.useState(false);
 
+  // Bedrock model selection (stored separately in localStorage for direct access by chatbot)
+  const [selectedModelId, setSelectedModelId] = React.useState("us.anthropic.claude-sonnet-4-5-20250929-v1:0");
+
+  // Test connection state
+  const [testStatus, setTestStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
+  const [testTime, setTestTime] = React.useState<number>(0);
+  const [testError, setTestError] = React.useState<string>("");
+
   // Avoid hydration mismatch with theme
   React.useEffect(() => {
     setMounted(true);
+    // Load selectedModelId from localStorage
+    try {
+      const stored = localStorage.getItem("selectedModelId");
+      if (stored) setSelectedModelId(stored);
+    } catch {}
   }, []);
+
+  const handleTestConnection = async () => {
+    setTestStatus("loading");
+    setTestError("");
+    const start = Date.now();
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const lambdaUrl = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL || "https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/";
+      const response = await fetch(lambdaUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "Generate a simple S3 bucket diagram",
+          modelId: selectedModelId,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      const elapsed = Date.now() - start;
+      if (response.ok) {
+        setTestTime(elapsed);
+        setTestStatus("success");
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setTestError((data as { error?: string }).error || `HTTP ${response.status}`);
+        setTestStatus("error");
+      }
+    } catch (err) {
+      clearTimeout(timeout);
+      if (err instanceof Error && err.name === "AbortError") {
+        setTestError("Request timed out (30s)");
+      } else {
+        setTestError("Network error");
+      }
+      setTestStatus("error");
+    }
+  };
 
   const updateSetting = <K extends keyof AppSettings>(
     key: K,
@@ -237,13 +297,16 @@ export default function SettingsPage() {
           id="model-heading"
           className="text-lg font-semibold text-foreground"
         >
-          LLM Model
+          Bedrock Model
         </h2>
         <div className="grid gap-2">
           <Label htmlFor="model-select">Model</Label>
           <Select
-            value={settings.llmModel}
-            onValueChange={(value) => updateSetting("llmModel", value)}
+            value={selectedModelId}
+            onValueChange={(value) => {
+              setSelectedModelId(value);
+              try { localStorage.setItem("selectedModelId", value); } catch {}
+            }}
           >
             <SelectTrigger id="model-select" className="w-full max-w-xs">
               <SelectValue placeholder="Select model" />
@@ -257,9 +320,40 @@ export default function SettingsPage() {
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            The AI model used to interpret prompts and generate architecture
-            specifications.
+            The Amazon Bedrock model used to generate and modify architecture
+            diagrams. Claude Sonnet 4 is recommended for best results.
           </p>
+        </div>
+
+        {/* Test Connection */}
+        <div className="flex items-center gap-3 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTestConnection}
+            disabled={testStatus === "loading"}
+          >
+            {testStatus === "loading" ? (
+              <>
+                <svg className="mr-1.5 h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                Testing...
+              </>
+            ) : (
+              "Test Connection"
+            )}
+          </Button>
+          {testStatus === "success" && (
+            <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              Connected ({testTime}ms)
+            </span>
+          )}
+          {testStatus === "error" && (
+            <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              {testError}
+            </span>
+          )}
         </div>
       </section>
 
