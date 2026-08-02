@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/create';
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
   const { signIn, signInWithProvider, isAuthenticated, isLoading, error, clearError } =
     useAuth();
 
@@ -32,7 +32,14 @@ function LoginContent() {
   // Watch for successful authentication and redirect
   if (isAuthenticated) {
     router.push(callbackUrl);
-    return null;
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+          <p className="text-sm text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

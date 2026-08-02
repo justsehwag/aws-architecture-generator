@@ -1,0 +1,11 @@
+{
+  "client_id": "Ov23liPkW8CzqlY9hk8E",
+  "client_secret": "6f0d839d2fc83effa4f2808bf92b7e14b55abb6e",
+  "attributes_request_method": "GET",
+  "oidc_issuer": "https://token.actions.githubusercontent.com",
+  "authorize_scopes": "openid email profile user:email",
+  "authorize_url": "https://github.com/login/oauth/authorize",
+  "token_url": "https://github.com/login/oauth/access_token",
+  "attributes_url": "https://api.github.com/user",
+  "jwks_uri": "https://token.actions.githubusercontent.com/.well-known/jwks"
+}
