@@ -301,6 +301,134 @@ export function validateDrawioXml(xml: string): boolean {
 }
 
 // ============================================================
+// Chat Mode
+// ============================================================
+
+const CHAT_SYSTEM_PROMPT = `You are an AWS Solutions Architect assistant. You can see the user's current architecture diagram XML. Answer questions about it, explain the architecture, suggest improvements, describe data flow, etc. Be concise and helpful.`;
+
+/**
+ * Handles chat mode requests — conversational Q&A about the architecture.
+ * Skips XML generation/validation and returns raw text response.
+ */
+async function handleChatMode(
+  prompt: string,
+  requestId: string,
+  conversationHistory?: Array<{ role: string; content: string }>,
+  currentXml?: string,
+  modelId?: string
+): Promise<LambdaFunctionURLResponse> {
+  try {
+    const messages: Array<{ role: string; content: string }> = [];
+
+    // If currentXml is provided, include it as context
+    if (currentXml) {
+      messages.push({
+        role: 'user',
+        content: `Here is the current Draw.io XML diagram for context:\n\n${currentXml}\n\nI have a question about this architecture.`,
+      });
+      messages.push({
+        role: 'assistant',
+        content: 'I can see your architecture diagram. What would you like to know?',
+      });
+    }
+
+    // Append conversation history if provided
+    if (conversationHistory && conversationHistory.length > 0) {
+      for (const msg of conversationHistory) {
+        messages.push({ role: msg.role, content: msg.content });
+      }
+    }
+
+    // Add the user's current prompt as the final message
+    messages.push({ role: 'user', content: prompt });
+
+    // Truncate oldest history messages if total context exceeds limit
+    const totalChars = () => messages.reduce((sum, m) => sum + m.content.length, 0);
+    while (totalChars() > MAX_CONTEXT_CHARS && messages.length > 1) {
+      messages.shift();
+    }
+
+    // Call Bedrock with the chat system prompt instead of the XML generation prompt
+    const resolvedModelId = modelId || BEDROCK_MODEL_ID;
+    const requestBody = JSON.stringify({
+      anthropic_version: 'bedrock-2023-05-31',
+      max_tokens: 4096,
+      temperature: 0.3,
+      system: CHAT_SYSTEM_PROMPT,
+      messages,
+    });
+
+    let lastError: Error | undefined;
+    let textResponse = '';
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const command = new InvokeModelCommand({
+          modelId: resolvedModelId,
+          contentType: 'application/json',
+          accept: 'application/json',
+          body: requestBody,
+        });
+
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            const err = new Error(`Bedrock request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+            err.name = 'TimeoutError';
+            reject(err);
+          }, REQUEST_TIMEOUT_MS);
+        });
+
+        const response = await Promise.race([
+          bedrockClient.send(command),
+          timeoutPromise,
+        ]);
+
+        const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+        textResponse = responseBody.content?.[0]?.text || '';
+
+        if (!textResponse) {
+          throw new Error('Empty response from Bedrock model');
+        }
+
+        break; // Success
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        if (isAccessDeniedError(error)) throw error;
+        lastError = error;
+        if (isRetryableError(error) && attempt < MAX_RETRIES) {
+          await sleep((attempt + 1) * 1000);
+          continue;
+        }
+        break;
+      }
+    }
+
+    if (!textResponse) {
+      const error = lastError || new Error('Bedrock invocation failed');
+      if (isAccessDeniedError(error)) {
+        return errorResponse(503, 'Bedrock model is not enabled or access is denied.', 'MODEL_ACCESS_DENIED', requestId);
+      }
+      if (isRetryableError(error)) {
+        return errorResponse(502, `Chat request failed after multiple attempts: ${error.message}`, 'LLM_ERROR', requestId);
+      }
+      return errorResponse(502, `Chat request failed: ${error.message}`, 'LLM_ERROR', requestId);
+    }
+
+    return {
+      statusCode: 200,
+      headers: responseHeaders(),
+      body: JSON.stringify({ response: textResponse, mode: 'chat' }),
+    };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    if (isAccessDeniedError(error)) {
+      return errorResponse(503, 'Bedrock model is not enabled or access is denied.', 'MODEL_ACCESS_DENIED', requestId);
+    }
+    return errorResponse(502, `Chat request failed: ${error.message}`, 'LLM_ERROR', requestId);
+  }
+}
+
+// ============================================================
 // Diagram Generation
 // ============================================================
 
@@ -498,11 +626,12 @@ export const handler = async (
   }
 
   // Validate prompt field
-  const { prompt, conversationHistory, currentXml, modelId } = body as {
+  const { prompt, conversationHistory, currentXml, modelId, mode } = body as {
     prompt: unknown;
     conversationHistory?: Array<{ role: string; content: string }>;
     currentXml?: string;
     modelId?: string;
+    mode?: string;
   };
 
   if (!prompt || typeof prompt !== 'string') {
@@ -532,8 +661,19 @@ export const handler = async (
     );
   }
 
-  // Generate diagram via Bedrock
+  // Route based on mode
   try {
+    if (mode === 'chat') {
+      return await handleChatMode(
+        prompt,
+        requestId,
+        conversationHistory,
+        currentXml as string | undefined,
+        modelId as string | undefined
+      );
+    }
+
+    // Default: XML generation mode
     return await generateDiagram(
       prompt,
       requestId,

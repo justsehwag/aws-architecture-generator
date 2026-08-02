@@ -30,6 +30,38 @@ const LAMBDA_URL =
 
 const MAX_XML_LENGTH = 45_000;
 
+/** Prefixes/keywords that indicate a conversational (chat) question rather than a diagram edit */
+const CHAT_PREFIXES = [
+  "why",
+  "what",
+  "how",
+  "explain",
+  "describe",
+  "analyze",
+  "analyse",
+  "tell me about",
+  "list",
+  "suggest",
+  "compare",
+  "is there",
+  "are there",
+  "can you",
+  "could you explain",
+  "what is",
+  "what are",
+  "estimate",
+];
+
+/** Suggestion chips shown above the input */
+const SUGGESTION_CHIPS = [
+  { label: "Explain this architecture", mode: "chat" as const },
+  { label: "Describe the data flow", mode: "chat" as const },
+  { label: "Suggest improvements", mode: "chat" as const },
+  { label: "List all services", mode: "chat" as const },
+  { label: "Add CloudWatch monitoring", mode: "xml" as const },
+  { label: "Estimate monthly cost", mode: "chat" as const },
+];
+
 // --- Helpers ---
 
 function getSelectedModelId(): string | null {
@@ -46,9 +78,29 @@ function truncateXml(xml: string): string {
 }
 
 /**
- * Chat panel for natural language diagram editing.
+ * Detects whether the user's input is a conversational question (chat mode)
+ * or a diagram modification request (xml mode).
+ */
+function detectMode(input: string): "chat" | "xml" {
+  const lower = input.toLowerCase().trim();
+  for (const prefix of CHAT_PREFIXES) {
+    if (lower.startsWith(prefix)) {
+      return "chat";
+    }
+  }
+  // If it ends with a question mark, treat as chat
+  if (lower.endsWith("?")) {
+    return "chat";
+  }
+  return "xml";
+}
+
+/**
+ * Chat panel for natural language diagram editing AND conversational Q&A.
  * Maintains conversation history, sends currentXml + conversationHistory + modelId to Lambda.
- * Updates the Draw.io editor in real-time via onArchitectureUpdate callback.
+ * Supports two modes:
+ * - "xml": generates diagram updates via onArchitectureUpdate callback
+ * - "chat": displays conversational responses about the architecture
  */
 export function DiagramChat({ currentXml, onArchitectureUpdate, className }: DiagramChatProps) {
   const [messages, setMessages] = React.useState<ChatMessage[]>([
@@ -56,7 +108,7 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
       id: "welcome",
       role: "assistant",
       content:
-        "I can see your current architecture. Tell me what to change:\n\n• \"Add a WAF in front of the ALB\"\n• \"Add CloudWatch monitoring\"\n• \"Replace RDS with Aurora Serverless\"\n• \"Add an S3 bucket for static assets\"\n• \"Remove the NAT Gateway\"",
+        "I can help you understand and modify your architecture. Ask me questions or request changes:\n\n• \"Explain this architecture\"\n• \"Add a WAF in front of the ALB\"\n• \"Describe the data flow\"\n• \"Add CloudWatch monitoring\"\n• \"Suggest improvements\"",
       timestamp: new Date(),
     },
   ]);
@@ -69,13 +121,6 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Clear history on unmount (session-scoped)
-  React.useEffect(() => {
-    return () => {
-      // Conversation history is component-scoped, cleared on unmount
-    };
-  }, []);
-
   /**
    * Build conversation history for the request payload.
    * Excludes the welcome message and maps to { role, content } format.
@@ -86,38 +131,36 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
       .map((m) => ({ role: m.role, content: m.content }));
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const submitMessage = async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       role: "user",
-      content: input.trim(),
+      content: messageText.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const userPrompt = input.trim();
     setInput("");
     setIsLoading(true);
 
+    // Detect mode based on input content
+    const mode = detectMode(messageText.trim());
+
     try {
-      // Read model selection from localStorage
       const modelId = getSelectedModelId();
 
-      // Build request payload
       const payload: Record<string, unknown> = {
-        prompt: userPrompt,
+        prompt: messageText.trim(),
         conversationHistory: buildConversationHistory(),
+        mode,
       };
 
-      // Include currentXml (truncated if needed)
       if (currentXml) {
         payload.currentXml = truncateXml(currentXml);
       }
 
-      // Include modelId if set
       if (modelId) {
         payload.modelId = modelId;
       }
@@ -130,26 +173,36 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
 
       if (response.ok) {
         const data = await response.json();
-        const drawioXml = data.drawioXml;
 
-        const aiMessage: ChatMessage = {
-          id: `msg-${Date.now()}-ai`,
-          role: "assistant",
-          content: "Done! Architecture updated. The diagram is refreshing...",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, aiMessage]);
+        if (data.mode === "chat") {
+          // Chat mode: display the text response
+          const aiMessage: ChatMessage = {
+            id: `msg-${Date.now()}-ai`,
+            role: "assistant",
+            content: data.response || "I couldn't generate a response.",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else if (data.drawioXml) {
+          // XML mode: update the diagram
+          const aiMessage: ChatMessage = {
+            id: `msg-${Date.now()}-ai`,
+            role: "assistant",
+            content: "Done! Architecture updated. The diagram is refreshing...",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, aiMessage]);
 
-        // Notify parent with the new XML
-        if (onArchitectureUpdate && drawioXml) {
-          onArchitectureUpdate(drawioXml);
+          if (onArchitectureUpdate) {
+            onArchitectureUpdate(data.drawioXml);
+          }
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
         const aiMessage: ChatMessage = {
           id: `msg-${Date.now()}-ai`,
           role: "assistant",
-          content: `I couldn't process that change. ${(errorData as { error?: string }).error || "Try being more specific."}`,
+          content: `I couldn't process that. ${(errorData as { error?: string }).error || "Try being more specific."}`,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, aiMessage]);
@@ -167,6 +220,16 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitMessage(input);
+  };
+
+  const handleChipClick = (chipLabel: string) => {
+    if (isLoading) return;
+    submitMessage(chipLabel);
   };
 
   return (
@@ -215,40 +278,60 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
               <Loader2 className="h-3.5 w-3.5 text-primary animate-spin" />
             </div>
             <div className="bg-muted rounded-lg px-3 py-2 text-xs text-muted-foreground">
-              Updating architecture...
+              Thinking...
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="p-3 border-t border-border">
-        <div className="flex gap-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            placeholder="Describe changes..."
-            className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            rows={2}
-            disabled={isLoading}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!input.trim() || isLoading}
-            className="self-end h-8 w-8"
-          >
-            <Send className="h-3.5 w-3.5" />
-          </Button>
+      {/* Suggestion Chips + Input */}
+      <div className="border-t border-border">
+        {/* Suggestion Chips */}
+        <div className="px-3 pt-3 pb-1 overflow-x-auto">
+          <div className="flex gap-1.5 flex-nowrap">
+            {SUGGESTION_CHIPS.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => handleChipClick(chip.label)}
+                disabled={isLoading}
+                className="bg-muted hover:bg-muted/80 text-xs px-3 py-1.5 rounded-full whitespace-nowrap text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </form>
+
+        {/* Input */}
+        <form onSubmit={handleSubmit} className="p-3 pt-2">
+          <div className="flex gap-2">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+              placeholder="Ask a question or describe changes..."
+              className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              rows={2}
+              disabled={isLoading}
+            />
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input.trim() || isLoading}
+              className="self-end h-8 w-8"
+            >
+              <Send className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
