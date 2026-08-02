@@ -68,7 +68,10 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
     'api-gateway': 'api_gateway', 'nat-gateway': 'vpc_nat_gateway', 'route53': 'route_53',
     'step-functions': 'step_functions', 'elastic-beanstalk': 'elastic_beanstalk',
     'secrets-manager': 'secrets_manager', 'certificate-manager': 'certificate_manager',
-    'app-runner': 'app_runner',
+    'app-runner': 'app_runner', 'alb': 'application_load_balancer',
+    'nlb': 'network_load_balancer', 'elb': 'elastic_load_balancing',
+    'guardduty': 'guardduty', 'shield': 'shield', 'ecr': 'ecr',
+    'security-hub': 'security_hub', 'inspector': 'inspector',
   };
 
   // Sort services into tiers
@@ -79,24 +82,38 @@ function generateDrawioXmlFromSpec(spec: { services?: Array<{ id: string; label:
   });
 
   // Layout: each tier is a column, services spread vertically within
-  const tierX = [60, 260, 480, 720, 480]; // x position per tier
-  const startY = 60;
-  const spacingY = 120;
+  const tierX = [60, 280, 520, 780, 520]; // x position per tier (wider spacing)
+  const startY = 80;
+  const spacingY = 130; // more vertical spacing
 
   let cells = '<mxCell id="0"/><mxCell id="1" parent="0"/>';
 
   // Place services
   const positions: Record<string, { x: number; y: number }> = {};
   tiers.forEach((tierServices, tierIdx) => {
-    tierServices.forEach((svc, i) => {
-      const x = tierX[tierIdx];
-      const y = tierIdx === 4 ? startY + (tiers[2].length + 1) * spacingY + i * spacingY : startY + i * spacingY;
-      positions[svc.id] = { x, y };
-      const fill = colorMap[svc.type] || '#232F3E';
-      const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
-      const label = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      cells += `<mxCell id="${svc.id}" value="${label}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="60" height="60" as="geometry"/></mxCell>`;
-    });
+    if (tierIdx === 4) {
+      // Security/monitoring tier: spread horizontally below main flow
+      const secY = startY + Math.max(tiers[0].length, tiers[1].length, tiers[2].length, tiers[3].length) * spacingY + 60;
+      tierServices.forEach((svc, i) => {
+        const x = 60 + i * 180;
+        const y = secY;
+        positions[svc.id] = { x, y };
+        const fill = colorMap[svc.type] || '#232F3E';
+        const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
+        const label = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        cells += `<mxCell id="${svc.id}" value="${label}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="60" height="60" as="geometry"/></mxCell>`;
+      });
+    } else {
+      tierServices.forEach((svc, i) => {
+        const x = tierX[tierIdx];
+        const y = startY + i * spacingY;
+        positions[svc.id] = { x, y };
+        const fill = colorMap[svc.type] || '#232F3E';
+        const resIcon = iconMap[svc.type] || svc.type.replace(/-/g, '_');
+        const label = svc.label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        cells += `<mxCell id="${svc.id}" value="${label}" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=${fill};strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.${resIcon}" vertex="1" parent="1"><mxGeometry x="${x}" y="${y}" width="60" height="60" as="geometry"/></mxCell>`;
+      });
+    }
   });
 
   // Place connections with proper edge styles

@@ -77,7 +77,13 @@ ec2, lambda, ecs, eks, fargate, elastic-beanstalk, lightsail, batch, outposts, a
     - Data layer (RDS, DynamoDB, S3) on the RIGHT (x: 700-1000)
     - Security/monitoring services (WAF, CloudWatch, IAM) ABOVE or BELOW the main flow
     - Space services vertically with y increments of 120-150px
-    - Main flow should be on a horizontal line (same y value ~300-400)`;
+    - Main flow should be on a horizontal line (same y value ~300-400)
+12. IMPORTANT - Keep the architecture focused and clean:
+    - Maximum 8-12 services for simple prompts, 12-18 for complex ones
+    - Do NOT add excessive security services unless specifically asked
+    - Focus on the CORE architecture: networking → compute → data
+    - Only add security services if the user mentions security, compliance, or Well-Architected
+    - Include at most 2-3 security/monitoring services unless explicitly requested`;
 
 /**
  * Builds the complete messages array for an architecture generation request.
