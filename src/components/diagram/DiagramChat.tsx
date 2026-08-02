@@ -72,9 +72,10 @@ export function DiagramChat({ architectureSpec, onArchitectureUpdate, className 
 
     try {
       // Send current architecture as context + user's modification request
-      const fullPrompt = `You have an existing AWS architecture. The current services are:\n\n${currentContext}\n\nThe user wants to: ${userPrompt}\n\nGenerate the COMPLETE updated architecture including ALL existing services plus the requested changes. Keep all existing services unless explicitly asked to remove them.`;
+      const fullPrompt = `You have an existing AWS architecture. The current services are:\n\n${currentContext}\n\nThe user wants to: ${userPrompt}\n\nGenerate the COMPLETE updated architecture as Draw.io XML. Include ALL existing services plus the requested changes. Keep all existing services unless explicitly asked to remove them.`;
 
-      const response = await fetch("/api/diagrams/generate", {
+      const functionUrl = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL || 'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
+      const response = await fetch(functionUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: fullPrompt }),
@@ -82,21 +83,19 @@ export function DiagramChat({ architectureSpec, onArchitectureUpdate, className 
 
       if (response.ok) {
         const data = await response.json();
-        const newSpec = data.architectureSpec;
-        const serviceCount = newSpec?.services?.length || 0;
+        const drawioXml = data.drawioXml;
 
         const aiMessage: ChatMessage = {
           id: `msg-${Date.now()}-ai`,
           role: "assistant",
-          content: `Done! Updated architecture now has ${serviceCount} services. The diagram is refreshing...`,
+          content: `Done! Architecture updated. The diagram is refreshing...`,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, aiMessage]);
 
-        // Generate XML from the new spec and notify parent
-        if (onArchitectureUpdate && newSpec) {
-          const xml = generateXmlFromSpec(newSpec);
-          onArchitectureUpdate(newSpec, xml);
+        // Notify parent with the new XML directly
+        if (onArchitectureUpdate && drawioXml) {
+          onArchitectureUpdate(null, drawioXml);
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
