@@ -163,8 +163,9 @@ export function useExport(): UseExportReturn {
                   fontSize: 10,
                   align: 'center',
                   valign: 'middle',
-                  border: { type: 'solid', color: '333333', pt: 1 },
+                  shape: pptx.ShapeType.roundRect,
                   fill: { color: 'F5F5F5' },
+                  line: { color: '333333', width: 1 },
                 });
               });
 
