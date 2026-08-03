@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { useDashboard } from "@/hooks/useDashboard";
 import {
   softDeleteDiagram,
@@ -45,19 +46,148 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 /**
+ * Landing page for unauthenticated users.
+ */
+function LandingPage() {
+  return (
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Background gradient + grid pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: 'radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)',
+        backgroundSize: '24px 24px'
+      }} />
+      
+      {/* Floating architecture diagram shapes (decorative) */}
+      <div className="absolute top-20 right-10 w-64 h-64 opacity-10">
+        <svg viewBox="0 0 200 200" className="w-full h-full text-primary" fill="none" stroke="currentColor" strokeWidth="1">
+          <rect x="10" y="10" width="60" height="40" rx="4" />
+          <rect x="80" y="60" width="60" height="40" rx="4" />
+          <rect x="10" y="110" width="60" height="40" rx="4" />
+          <rect x="80" y="140" width="60" height="40" rx="4" />
+          <line x1="70" y1="30" x2="80" y2="80" />
+          <line x1="40" y1="110" x2="110" y2="100" />
+          <line x1="70" y1="130" x2="80" y2="140" />
+        </svg>
+      </div>
+      <div className="absolute bottom-20 left-10 w-48 h-48 opacity-10">
+        <svg viewBox="0 0 200 200" className="w-full h-full text-primary" fill="none" stroke="currentColor" strokeWidth="1">
+          <circle cx="100" cy="40" r="25" />
+          <rect x="30" y="100" width="50" height="35" rx="4" />
+          <rect x="120" y="100" width="50" height="35" rx="4" />
+          <line x1="100" y1="65" x2="55" y2="100" />
+          <line x1="100" y1="65" x2="145" y2="100" />
+        </svg>
+      </div>
+
+      {/* Content */}
+      <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 text-center">
+        <div className="max-w-2xl space-y-6">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Powered by Amazon Bedrock + Claude Sonnet
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+            Generate AWS Architecture
+            <br />
+            <span className="text-primary">Diagrams with AI</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Describe your infrastructure in plain English. Get professional Draw.io diagrams
+            with official AWS icons, VPC layouts, and data flow connections in seconds.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <a
+              href="/auth/login"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl"
+            >
+              Sign In
+            </a>
+            <a
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              Create Account
+            </a>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
+            <div className="rounded-lg border bg-card/50 p-4">
+              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold">Natural Language</h3>
+              <p className="text-xs text-muted-foreground mt-1">Describe your architecture in plain English</p>
+            </div>
+            <div className="rounded-lg border bg-card/50 p-4">
+              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold">Professional Diagrams</h3>
+              <p className="text-xs text-muted-foreground mt-1">Official AWS icons, VPC containers, edge routing</p>
+            </div>
+            <div className="rounded-lg border bg-card/50 p-4">
+              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold">AI Chat Refinement</h3>
+              <p className="text-xs text-muted-foreground mt-1">Modify diagrams conversationally with context</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Dashboard page (root route).
  *
- * Displays:
- * - Welcome greeting
- * - Recent Diagrams (up to 10 most-recently-modified)
- * - Quick Start Templates (top 4 built-in templates)
- * - Usage Statistics (total diagrams, total generations)
- * - Create New Diagram CTA
- * - Empty state for new users
+ * Shows a landing page for unauthenticated users, or the dashboard for authenticated users.
  *
  * Validates: Requirements 11.1, 11.8
  */
 export default function DashboardPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Show loading spinner while auth state is being determined
+  if (authLoading) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+      </div>
+    );
+  }
+
+  // Show landing page for unauthenticated users
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
+  // Show dashboard for authenticated users
+  return <AuthenticatedDashboard />;
+}
+
+/**
+ * Authenticated dashboard with recent diagrams, stats, etc.
+ */
+function AuthenticatedDashboard() {
   const { recentDiagrams, stats, isLoading, error, refresh } = useDashboard();
   const [deletedDiagrams, setDeletedDiagrams] = React.useState<DeletedDiagram[]>([]);
   const [deletedOpen, setDeletedOpen] = React.useState(false);
@@ -274,8 +404,6 @@ export default function DashboardPage() {
           )}
         </section>
       )}
-
-
     </div>
   );
 }

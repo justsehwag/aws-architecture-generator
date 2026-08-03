@@ -148,39 +148,64 @@ export function useTemplates(): UseTemplatesReturn {
     [templates, searchQuery, categoryFilter]
   );
 
-  // Load a template into the diagram viewer
+  // Load a template into the diagram viewer by generating via Lambda
   const loadTemplate = React.useCallback(
     async (templateId: string): Promise<string | null> => {
       setLoadStatus("loading");
       setLoadError(null);
 
       try {
-        const response = await fetch(`/api/templates/${templateId}/load`, {
+        // Find the template data
+        const template = templates.find(t => t.templateId === templateId);
+        if (!template) {
+          setLoadStatus("error");
+          setLoadError("Template not found");
+          return null;
+        }
+
+        // Generate a diagram from the template description using Lambda
+        const lambdaUrl = process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL || 'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
+        const prompt = `Generate a professional AWS architecture diagram for: ${template.name}. Include these services: ${template.description}. Use proper VPC layout with public and private subnets.`;
+
+        const response = await fetch(lambdaUrl, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
-          const message =
-            errorData?.message ??
-            `Failed to load template (${response.status})`;
           setLoadStatus("error");
-          setLoadError(message);
+          setLoadError(errorData?.error || "Failed to generate diagram from template");
           return null;
         }
 
         const data = await response.json();
+        const diagramId = data.diagramId || `tmpl-${Date.now()}`;
+        
+        // Store in sessionStorage
+        try {
+          sessionStorage.setItem(`diagram_${diagramId}`, JSON.stringify({
+            diagramId,
+            drawioXml: data.drawioXml,
+            name: template.name,
+          }));
+          // Also save to localStorage drafts
+          const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]');
+          drafts.unshift({ diagramId, name: template.name, createdAt: new Date().toISOString(), xml: data.drawioXml });
+          if (drafts.length > 20) drafts.pop();
+          localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
+        } catch {}
+
         setLoadStatus("success");
-        return data.diagramId ?? templateId;
+        return diagramId;
       } catch {
         setLoadStatus("error");
-        setLoadError(
-          "Unable to load the template. Please check your connection and try again."
-        );
+        setLoadError("Unable to load the template. Please try again.");
         return null;
       }
     },
-    []
+    [templates]
   );
 
   const resetLoadState = React.useCallback(() => {
