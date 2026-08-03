@@ -200,6 +200,20 @@ export default function DiagramViewerPage() {
               localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
             }
           } catch { /* ignore */ }
+          // Ensure diagram is persisted to DynamoDB (non-blocking)
+          if (xml) {
+            fetch('/api/diagrams/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                diagramId: cachedData.diagramId ?? diagramId,
+                name: cachedData.name || spec?.name || 'Generated Diagram',
+                prompt: '',
+                drawioXml: xml,
+                serviceCount: (xml.match(/shape=mxgraph\.aws4\./g) || []).length,
+              }),
+            }).catch(() => {});
+          }
           setIsLoading(false);
           return;
         }
@@ -377,6 +391,18 @@ export default function DiagramViewerPage() {
                     name: diagramData.name,
                   }));
                 } catch {}
+                // Persist to DynamoDB for cross-device sync (non-blocking)
+                fetch('/api/diagrams/save', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    diagramId,
+                    name: diagramData.name,
+                    prompt: '',
+                    drawioXml: newXml,
+                    serviceCount: (newXml.match(/shape=mxgraph\.aws4\./g) || []).length,
+                  }),
+                }).catch(() => {});
               }}
             />
           ) : (
@@ -414,6 +440,18 @@ export default function DiagramViewerPage() {
                   }
                   localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
                 } catch {}
+                // Persist to DynamoDB for cross-device sync (non-blocking)
+                fetch('/api/diagrams/save', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    diagramId,
+                    name: diagramData.name,
+                    prompt: '',
+                    drawioXml: xml,
+                    serviceCount: (xml.match(/shape=mxgraph\.aws4\./g) || []).length,
+                  }),
+                }).catch(() => {});
               }}
               className="h-full"
             />

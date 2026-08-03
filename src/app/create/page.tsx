@@ -78,6 +78,20 @@ function CreateDiagramContent() {
           name: diagramName,
         }));
       } catch {}
+
+      // Persist to DynamoDB for cross-device sync (non-blocking)
+      fetch('/api/diagrams/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          diagramId: drawioId,
+          name: diagramName,
+          prompt: lastPrompt,
+          drawioXml,
+          serviceCount: (drawioXml.match(/shape=mxgraph\.aws4\./g) || []).length,
+        }),
+      }).catch(() => {});
+
       setStep('generating-diagram');
       setStep('analyzing');
       setReady();
