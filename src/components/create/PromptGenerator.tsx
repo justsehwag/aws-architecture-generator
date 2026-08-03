@@ -51,6 +51,7 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [userInstructions, setUserInstructions] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((file: File) => {
@@ -114,6 +115,10 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
     const content = uploadedContent || pastedContent;
     if (!content.trim()) return;
 
+    const fullContent = userInstructions.trim()
+      ? `${content}\n\n--- User Instructions ---\n${userInstructions.trim()}`
+      : content;
+
     setIsAnalyzing(true);
     setAnalyzeError(null);
 
@@ -122,7 +127,7 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: SYSTEM_INSTRUCTION + content,
+          prompt: SYSTEM_INSTRUCTION + fullContent,
           mode: 'chat',
           conversationHistory: [],
         }),
@@ -145,7 +150,7 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
     } finally {
       setIsAnalyzing(false);
     }
-  }, [uploadedContent, pastedContent, onPromptGenerated]);
+  }, [uploadedContent, pastedContent, userInstructions, onPromptGenerated]);
 
   const hasContent = !!(uploadedContent || pastedContent.trim());
 
@@ -247,6 +252,31 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
             'resize-y min-h-[120px]'
           )}
         />
+      </div>
+
+      {/* Additional Instructions */}
+      <div>
+        <label htmlFor="user-instructions" className="text-sm font-medium leading-none mb-2 block">
+          Additional instructions (optional)
+        </label>
+        <textarea
+          id="user-instructions"
+          value={userInstructions}
+          onChange={(e) => setUserInstructions(e.target.value)}
+          placeholder="E.g., 'Migrate this to serverless architecture', 'Focus on cost optimization', 'Include multi-AZ setup for high availability'..."
+          rows={3}
+          disabled={isDisabled || isAnalyzing}
+          className={cn(
+            'flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
+            'placeholder:text-muted-foreground',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            'resize-y min-h-[80px]'
+          )}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Tell us what you&apos;d like to do with this inventory — migrate, modernize, optimize, etc.
+        </p>
       </div>
 
       {/* Generate Prompt Button */}
