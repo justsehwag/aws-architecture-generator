@@ -88,12 +88,12 @@ function LandingPage() {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Powered by Amazon Bedrock + Claude Sonnet
+            AI-Powered Architecture Generator
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-            Generate AWS Architecture
+            Generate Cloud Architecture
             <br />
             <span className="text-primary">Diagrams with AI</span>
           </h1>
@@ -101,7 +101,7 @@ function LandingPage() {
           {/* Subtitle */}
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             Describe your infrastructure in plain English. Get professional Draw.io diagrams
-            with official AWS icons, VPC layouts, and data flow connections in seconds.
+            with official AWS, Azure, or GCP icons, VPC layouts, and data flow connections in seconds.
           </p>
 
           {/* CTA Buttons */}
@@ -227,7 +227,7 @@ function AuthenticatedDashboard() {
             Welcome back
           </h1>
           <p className="mt-1 text-muted-foreground">
-            Convert natural language descriptions into professional AWS
+            Convert natural language descriptions into professional cloud
             architecture diagrams.
           </p>
         </div>

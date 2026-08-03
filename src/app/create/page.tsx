@@ -21,6 +21,7 @@ import {
 } from '@/lib/errors/generation-errors';
 
 type CreateMode = 'manual' | 'generator';
+type CloudProvider = 'aws' | 'azure' | 'gcp';
 
 /**
  * Create Diagram page content.
@@ -56,6 +57,7 @@ function CreateDiagramContent() {
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [createMode, setCreateMode] = useState<CreateMode>('manual');
   const [sharedPrompt, setSharedPrompt] = useState<string>('');
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>('aws');
 
   // Watch for successful generation from the drawio generator hook
   useEffect(() => {
@@ -143,14 +145,23 @@ function CreateDiagramContent() {
   const handleGenerate = useCallback(
     (prompt: string) => {
       guardAction(async () => {
+        // Prepend cloud provider instruction
+        let enrichedPrompt = prompt;
+        if (cloudProvider === 'azure') {
+          enrichedPrompt = `Generate an Azure architecture diagram using Azure service icons (shape=mxgraph.azure2.*). Use Azure-specific services like Azure App Service, Azure SQL, Azure Functions, Azure Blob Storage, etc. ${prompt}`;
+        } else if (cloudProvider === 'gcp') {
+          enrichedPrompt = `Generate a Google Cloud Platform architecture diagram using GCP service icons (shape=mxgraph.gcp2.*). Use GCP-specific services like Cloud Run, Cloud SQL, Cloud Functions, Cloud Storage, BigQuery, etc. ${prompt}`;
+        }
+        // AWS is the default — no prefix needed (system prompt handles it)
+
         setLastPrompt(prompt);
         setGenerationError(null);
         resetDrawio();
         startGeneration();
-        await generateDrawio(prompt);
+        await generateDrawio(enrichedPrompt);
       });
     },
-    [guardAction, startGeneration, generateDrawio, resetDrawio]
+    [guardAction, startGeneration, generateDrawio, resetDrawio, cloudProvider]
   );
 
   /**
@@ -184,7 +195,7 @@ function CreateDiagramContent() {
             Create Diagram
           </h1>
           <p className="mt-1 text-muted-foreground">
-            Describe your AWS architecture in plain English and generate a professional diagram.
+            Describe your cloud architecture in plain English and generate a professional diagram.
           </p>
         </div>
         <ThemeToggle />
@@ -199,6 +210,46 @@ function CreateDiagramContent() {
           Browse templates
           <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>
+      </div>
+
+      {/* Cloud Provider Selection */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-foreground">Target Cloud:</span>
+        <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+          <button
+            type="button"
+            onClick={() => setCloudProvider('aws')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              cloudProvider === 'aws'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="text-[#FF9900]">●</span> AWS
+          </button>
+          <button
+            type="button"
+            onClick={() => setCloudProvider('azure')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              cloudProvider === 'azure'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="text-[#0078D4]">●</span> Azure
+          </button>
+          <button
+            type="button"
+            onClick={() => setCloudProvider('gcp')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              cloudProvider === 'gcp'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="text-[#4285F4]">●</span> GCP
+          </button>
+        </div>
       </div>
 
       {/* Mode Toggle */}

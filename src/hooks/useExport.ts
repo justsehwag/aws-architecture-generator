@@ -11,7 +11,8 @@ export type ExportFormat =
   | "svg"
   | "pdf"
   | "json"
-  | "markdown";
+  | "markdown"
+  | "pptx";
 
 export const SUPPORTED_FORMATS: ExportFormat[] = [
   "drawio",
@@ -20,6 +21,7 @@ export const SUPPORTED_FORMATS: ExportFormat[] = [
   "pdf",
   "json",
   "markdown",
+  "pptx",
 ];
 
 export type ExportStatus = "idle" | "exporting" | "success" | "error";
@@ -131,6 +133,48 @@ export function useExport(): UseExportReturn {
               const md = `# Architecture Diagram\n\n## Services\n\n${services.map((s: string) => `- ${s}`).join('\n')}\n\n## Exported\n\n${new Date().toISOString()}\n`;
               blob = new Blob([md], { type: 'text/markdown' });
               filename = `architecture-${diagramId}.md`;
+              break;
+            }
+            case 'pptx': {
+              // Dynamic import pptxgenjs
+              const PptxGenJS = (await import('pptxgenjs')).default;
+              const pptx = new PptxGenJS();
+
+              // Title slide
+              const titleSlide = pptx.addSlide();
+              titleSlide.addText('Architecture Diagram', { x: 1, y: 1, w: 8, h: 1, fontSize: 28, bold: true });
+              titleSlide.addText(`Generated: ${new Date().toLocaleDateString()}`, { x: 1, y: 2, w: 8, h: 0.5, fontSize: 14, color: '666666' });
+
+              // Diagram slide - extract service names and arrange as text boxes
+              const diagramSlide = pptx.addSlide();
+              const services = (xml.match(/value="([^"]+)"/g) || [])
+                .map((m: string) => m.replace('value="', '').replace('"', ''))
+                .filter((v: string) => v.length > 1 && v.length < 50);
+
+              // Add services as text boxes in a grid layout
+              services.forEach((service: string, i: number) => {
+                const col = i % 4;
+                const row = Math.floor(i / 4);
+                diagramSlide.addText(service, {
+                  x: 0.5 + col * 2.5,
+                  y: 0.5 + row * 1.2,
+                  w: 2.2,
+                  h: 0.8,
+                  fontSize: 10,
+                  align: 'center',
+                  valign: 'middle',
+                  border: { type: 'solid', color: '333333', pt: 1 },
+                  fill: { color: 'F5F5F5' },
+                });
+              });
+
+              // Add a note with the full Draw.io XML for re-import
+              diagramSlide.addNotes('Draw.io XML (import this back into draw.io):\n\n' + xml.slice(0, 2000));
+
+              // Generate and download
+              const pptxBlob = await pptx.write({ outputType: 'blob' }) as Blob;
+              blob = new Blob([pptxBlob], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+              filename = `architecture-${diagramId}.pptx`;
               break;
             }
             case 'svg':
