@@ -60,10 +60,16 @@ function CreateDiagramContent() {
   // Watch for successful generation from the drawio generator hook
   useEffect(() => {
     if (drawioXml && drawioId) {
-      // Generate a meaningful name from the prompt (first 60 chars)
-      const diagramName = lastPrompt
-        ? lastPrompt.slice(0, 60).trim() + (lastPrompt.length > 60 ? '...' : '')
-        : 'Architecture Diagram';
+      // Generate a meaningful name — extract key words from prompt
+      const generateDiagramName = (prompt: string): string => {
+        const words = prompt.split(/\s+/).slice(0, 8).join(' ');
+        if (words.length > 50) {
+          return words.slice(0, 47) + '...';
+        }
+        return words || 'Architecture Diagram';
+      };
+
+      const diagramName = generateDiagramName(lastPrompt);
 
       try {
         sessionStorage.setItem(`diagram_${drawioId}`, JSON.stringify({

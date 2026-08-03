@@ -137,7 +137,7 @@ export function DrawioEmbed({
         className="h-full w-full border-0"
         title="Architecture Diagram Editor"
         allow="clipboard-read; clipboard-write"
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads"
       />
     </div>
   );

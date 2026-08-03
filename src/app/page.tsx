@@ -8,8 +8,6 @@ import {
   FileText,
   Zap,
   Clock,
-  Layers,
-  ArrowRight,
   Trash2,
   RotateCcw,
   ChevronDown,
@@ -26,36 +24,7 @@ import {
   type DeletedDiagram,
 } from "@/utils/deleted-diagrams";
 
-/**
- * Quick-start templates shown on the Dashboard.
- * Displays the top 4 built-in templates as clickable cards.
- */
-const QUICK_START_TEMPLATES = [
-  {
-    id: "three-tier-web-app",
-    name: "3-Tier Web Application",
-    description: "CloudFront, ALB, EC2/ECS, Aurora",
-    category: "web-application",
-  },
-  {
-    id: "serverless-api",
-    name: "Serverless API",
-    description: "API Gateway, Lambda, DynamoDB",
-    category: "serverless",
-  },
-  {
-    id: "microservices",
-    name: "Microservices",
-    description: "ALB, ECS Fargate, RDS, ElastiCache",
-    category: "microservices",
-  },
-  {
-    id: "ai-chatbot",
-    name: "AI Chatbot",
-    description: "CloudFront, API Gateway, Bedrock, DynamoDB",
-    category: "ai-ml",
-  },
-];
+
 
 /**
  * Formats a date string into a human-readable relative time.
@@ -147,7 +116,7 @@ export default function DashboardPage() {
         <h2 id="stats-heading" className="sr-only">
           Usage Statistics
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <StatCard
             icon={<FileText className="h-5 w-5" aria-hidden="true" />}
             label="Total Diagrams"
@@ -157,11 +126,6 @@ export default function DashboardPage() {
             icon={<Zap className="h-5 w-5" aria-hidden="true" />}
             label="Total Generations"
             value={isLoading ? "—" : stats.totalGenerations.toString()}
-          />
-          <StatCard
-            icon={<Layers className="h-5 w-5" aria-hidden="true" />}
-            label="Quick Start Templates"
-            value={QUICK_START_TEMPLATES.length.toString()}
           />
         </div>
       </section>
@@ -311,49 +275,7 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {/* Quick Start Templates Section */}
-      <section aria-labelledby="templates-heading">
-        <div className="flex items-center justify-between">
-          <h2
-            id="templates-heading"
-            className="text-xl font-semibold text-foreground"
-          >
-            Quick Start Templates
-          </h2>
-          <Link
-            href="/templates"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Browse all
-            <ArrowRight className="h-3 w-3" aria-hidden="true" />
-          </Link>
-        </div>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {QUICK_START_TEMPLATES.map((template) => (
-            <Link
-              key={template.id}
-              href={`/create?template=${template.id}`}
-              className="group rounded-lg border border-border bg-card p-4 transition-colors duration-150 hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <div className="flex items-center gap-2">
-                <LayoutDashboard
-                  className="h-4 w-4 text-primary"
-                  aria-hidden="true"
-                />
-                <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary">
-                  {template.name}
-                </h3>
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {template.description}
-              </p>
-              <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                {template.category}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+
     </div>
   );
 }
