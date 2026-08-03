@@ -19,7 +19,23 @@ const LAMBDA_URL =
   process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL ||
   'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
 
-const SYSTEM_INSTRUCTION = `Given the following infrastructure inventory/documentation, generate a detailed AWS architecture description prompt that can be used to create a professional architecture diagram. Focus on identifying AWS services, their connections, and network topology:\n\n`;
+const SYSTEM_INSTRUCTION = `You are an AWS migration and architecture expert. Analyze the following infrastructure inventory, billing data, or documentation. This may include on-premises servers, Azure services, GCP services, or any other cloud/infrastructure data.
+
+Your job:
+1. Identify all services, workloads, and their relationships
+2. Map each service to the BEST equivalent AWS service (e.g., Azure App Service → AWS Elastic Beanstalk/ECS, GCP Cloud Functions → AWS Lambda, Azure SQL → Amazon RDS, GCP BigQuery → Amazon Redshift/Athena)
+3. Generate a detailed AWS architecture description prompt that includes:
+   - All AWS services needed
+   - Network topology (VPC, subnets, availability zones)
+   - Data flow and connections between services
+   - Security groups and access patterns
+   - Storage and database services
+
+Output ONLY the architecture prompt text (no explanation, no preamble). The prompt should be ready to generate a Draw.io diagram.
+
+Content to analyze:
+
+`;
 
 interface FileValidationResult {
   valid: boolean;
@@ -159,13 +175,15 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
       {/* Description */}
       <div className="text-sm text-muted-foreground space-y-2">
         <p>
-          Upload your infrastructure inventory, cloud configuration export, or paste documentation
-          below. I&apos;ll analyze it and generate an AWS architecture prompt for you.
+          Upload your infrastructure inventory, cloud bills, or configuration exports from
+          <strong> any platform</strong> (on-prem, Azure, GCP, AWS). I&apos;ll map everything
+          to AWS services and generate an architecture prompt.
         </p>
         <p>Examples of what you can upload:</p>
         <ul className="list-disc list-inside space-y-0.5 ml-1">
           <li>Server inventory spreadsheet (CSV/Excel)</li>
-          <li>Cloud configuration export (JSON)</li>
+          <li>Azure/GCP billing export or resource list (CSV/JSON)</li>
+          <li>Cloud configuration export (JSON/TXT)</li>
           <li>Migration planning document (PDF/TXT)</li>
           <li>Email thread discussing infrastructure requirements (EML)</li>
         </ul>
