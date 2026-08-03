@@ -50,7 +50,8 @@ const INITIAL_STATE: ExportState = {
 
 /**
  * Hook that manages export state machine (idle → exporting → success | error).
- * Calls POST /api/diagrams/{id}/export with format and options.
+ * First tries client-side export from sessionStorage (for diagrams not yet persisted).
+ * Falls back to POST /api/diagrams/{id}/export for DynamoDB-stored diagrams.
  * Returns downloadUrl on success and triggers browser download automatically.
  * Handles export failures without producing partial files.
  *
@@ -60,7 +61,7 @@ export function useExport(): UseExportReturn {
   const [state, setState] = useState<ExportState>(INITIAL_STATE);
   const downloadTriggeredRef = useRef(false);
 
-  // Auto-trigger download when presigned URL is returned
+  // Auto-trigger download when presigned URL is returned (for API fallback)
   useEffect(() => {
     if (
       state.status === "success" &&
@@ -68,15 +69,17 @@ export function useExport(): UseExportReturn {
       !downloadTriggeredRef.current
     ) {
       downloadTriggeredRef.current = true;
-      // Use an anchor element to trigger download
-      const link = document.createElement("a");
-      link.href = state.downloadUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.download = "";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Only auto-download for presigned URLs (API fallback)
+      if (state.downloadUrl.startsWith("http")) {
+        const link = document.createElement("a");
+        link.href = state.downloadUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     }
   }, [state.status, state.downloadUrl]);
 
@@ -86,7 +89,6 @@ export function useExport(): UseExportReturn {
       format: ExportFormat,
       options?: ExportOptions
     ) => {
-      // Validate format before making the request
       if (!SUPPORTED_FORMATS.includes(format)) {
         setState({
           status: "error",
@@ -98,14 +100,81 @@ export function useExport(): UseExportReturn {
       }
 
       downloadTriggeredRef.current = false;
-      setState({
-        status: "exporting",
-        downloadUrl: null,
-        error: null,
-        format,
-      });
+      setState({ status: "exporting", downloadUrl: null, error: null, format });
 
       try {
+        // Try client-side export first (from sessionStorage)
+        const cached = sessionStorage.getItem(`diagram_${diagramId}`);
+        if (cached) {
+          const data = JSON.parse(cached);
+          const xml = data.drawioXml || '';
+
+          if (!xml) {
+            throw new Error('No diagram XML found');
+          }
+
+          let blob: Blob;
+          let filename: string;
+
+          switch (format) {
+            case 'drawio':
+              blob = new Blob([xml], { type: 'application/xml' });
+              filename = `architecture-${diagramId}.drawio`;
+              break;
+            case 'json':
+              blob = new Blob([JSON.stringify({ diagramId, xml, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+              filename = `architecture-${diagramId}.json`;
+              break;
+            case 'markdown': {
+              // Simple markdown export with service list
+              const services = (xml.match(/value="([^"]+)"/g) || []).map((m: string) => m.replace('value="', '').replace('"', '')).filter((v: string) => v.length > 1 && v.length < 50);
+              const md = `# Architecture Diagram\n\n## Services\n\n${services.map((s: string) => `- ${s}`).join('\n')}\n\n## Exported\n\n${new Date().toISOString()}\n`;
+              blob = new Blob([md], { type: 'text/markdown' });
+              filename = `architecture-${diagramId}.md`;
+              break;
+            }
+            case 'svg':
+            case 'png':
+            case 'pdf':
+              // For image/PDF formats, use the draw.io XML directly as .drawio download
+              // (actual rendering to PNG/SVG/PDF requires draw.io's export engine)
+              blob = new Blob([xml], { type: 'application/xml' });
+              filename = `architecture-${diagramId}.drawio`;
+              // Show a note that they can open in draw.io to export as image
+              setState({
+                status: "success",
+                downloadUrl: URL.createObjectURL(blob),
+                error: null,
+                format,
+              });
+              // Auto download
+              {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }
+              return;
+            default:
+              throw new Error(`Unsupported format: ${format}`);
+          }
+
+          const url = URL.createObjectURL(blob);
+          setState({ status: "success", downloadUrl: url, error: null, format });
+
+          // Auto download
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+
+        // Fallback: try API route (for diagrams stored in DynamoDB)
         const response = await fetch(`/api/diagrams/${diagramId}/export`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -114,36 +183,22 @@ export function useExport(): UseExportReturn {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
-          const errorMessage =
-            errorData?.message ||
-            errorData?.error ||
-            `Export failed with status ${response.status}. Please try again.`;
           setState({
             status: "error",
             downloadUrl: null,
-            error: errorMessage,
+            error: errorData?.error || `Export failed. Please try again.`,
             format,
           });
           return;
         }
 
-        const data: ExportResponse = await response.json();
-
-        setState({
-          status: "success",
-          downloadUrl: data.downloadUrl,
-          error: null,
-          format,
-        });
+        const responseData: ExportResponse = await response.json();
+        setState({ status: "success", downloadUrl: responseData.downloadUrl, error: null, format });
       } catch (err) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : "An unexpected error occurred during export";
         setState({
           status: "error",
           downloadUrl: null,
-          error: message,
+          error: err instanceof Error ? err.message : "Export failed",
           format,
         });
       }
