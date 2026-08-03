@@ -40,21 +40,6 @@ const LLM_MODELS = [
   { value: "us.mistral.mistral-large-2411-v1:0", label: "Mistral Large" },
 ] as const;
 
-const KEYBOARD_SHORTCUTS = [
-  { keys: "Ctrl+Z", description: "Undo last action" },
-  { keys: "Ctrl+Y", description: "Redo last action" },
-  { keys: "Delete", description: "Delete selected node" },
-  { keys: "Ctrl+S", description: "Save diagram" },
-  { keys: "Ctrl+E", description: "Export diagram" },
-  { keys: "Ctrl++", description: "Zoom in" },
-  { keys: "Ctrl+-", description: "Zoom out" },
-  { keys: "Ctrl+0", description: "Reset zoom" },
-  { keys: "Escape", description: "Cancel current action" },
-  { keys: "Tab", description: "Navigate to next element" },
-  { keys: "Shift+Tab", description: "Navigate to previous element" },
-  { keys: "Enter", description: "Confirm / Activate" },
-] as const;
-
 const SETTINGS_STORAGE_KEY = "aws-arch-generator-settings";
 
 // --- Types ---
@@ -357,52 +342,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* Keyboard Shortcuts Reference */}
-      <section
-        className="space-y-4 rounded-lg border border-border p-6"
-        aria-labelledby="shortcuts-heading"
-      >
-        <h2
-          id="shortcuts-heading"
-          className="text-lg font-semibold text-foreground"
-        >
-          Keyboard Shortcuts
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Reference for available keyboard shortcuts in the diagram editor.
-        </p>
-        <div className="overflow-hidden rounded-md border border-border">
-          <table className="w-full text-sm" aria-label="Keyboard shortcuts">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="px-4 py-2 text-left font-medium text-foreground">
-                  Shortcut
-                </th>
-                <th className="px-4 py-2 text-left font-medium text-foreground">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {KEYBOARD_SHORTCUTS.map((shortcut) => (
-                <tr
-                  key={shortcut.keys}
-                  className="border-b last:border-b-0"
-                >
-                  <td className="px-4 py-2">
-                    <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">
-                      {shortcut.keys}
-                    </kbd>
-                  </td>
-                  <td className="px-4 py-2 text-muted-foreground">
-                    {shortcut.description}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
     </div>
   );
 }

@@ -243,14 +243,25 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
 
     // Special handling for pricing estimate
     if (finalPrompt === "Get AWS Pricing Estimate") {
-      finalPrompt = `Analyze the AWS services in my current architecture diagram and provide:
+      finalPrompt = `Analyze the AWS services in my current architecture diagram and provide a professional cost estimate. Format your response as:
 
-1. A table listing each AWS service, its estimated configuration (instance type, storage, monthly requests), and estimated monthly cost in USD
-2. The total estimated monthly cost
-3. Key assumptions you made
-4. A direct link to https://calculator.aws where I can refine this estimate
+**Monthly Cost Estimate**
 
-Use reasonable defaults for a production workload. Be concise.`;
+| Service | Config | Monthly Cost |
+|---------|--------|-------------|
+(list each service with realistic config and cost)
+
+**Total: $X/month**
+
+**Region:** (infer from diagram or default to us-east-1)
+
+**Assumptions:**
+- (list 3-4 key assumptions)
+
+**💰 Refine this estimate:** https://calculator.aws
+Add your specific services and workload parameters for an accurate official estimate.
+
+Be concise. Use realistic production defaults. Round costs to nearest dollar.`;
     }
 
     const userMessage: ChatMessage = {
