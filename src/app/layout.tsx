@@ -12,9 +12,9 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "AWS Architecture Generator",
+  title: "Cloud Architecture Generator",
   description:
-    "Convert natural language descriptions into professional AWS architecture diagrams",
+    "Convert natural language descriptions into professional cloud architecture diagrams",
 };
 
 export default function RootLayout({

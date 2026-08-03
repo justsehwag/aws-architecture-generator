@@ -30,35 +30,13 @@ const LAMBDA_URL =
 
 const MAX_XML_LENGTH = 45_000;
 
-/** Prefixes/keywords that indicate a conversational (chat) question rather than a diagram edit */
-const CHAT_PREFIXES = [
-  "why",
-  "what",
-  "how",
-  "explain",
-  "describe",
-  "analyze",
-  "analyse",
-  "tell me about",
-  "list",
-  "suggest",
-  "compare",
-  "is there",
-  "are there",
-  "can you",
-  "could you explain",
-  "what is",
-  "what are",
-  "estimate",
-];
-
 /** Suggestion chips shown above the input */
 const SUGGESTION_CHIPS = [
   { label: "Explain this architecture", mode: "chat" as const },
   { label: "Describe the data flow", mode: "chat" as const },
   { label: "Suggest improvements", mode: "chat" as const },
   { label: "List all services", mode: "chat" as const },
-  { label: "Add CloudWatch monitoring", mode: "xml" as const },
+  { label: "/add CloudWatch monitoring", mode: "xml" as const },
   { label: "Get AWS Pricing Estimate", mode: "chat" as const },
 ];
 
@@ -78,20 +56,16 @@ function truncateXml(xml: string): string {
 }
 
 /**
- * Detects whether the user's input is a conversational question (chat mode)
- * or a diagram modification request (xml mode).
+ * Detects mode based on slash prefix.
+ * /command → modify diagram (xml mode)
+ * Normal text → conversation (chat mode)
  */
 function detectMode(input: string): "chat" | "xml" {
-  const lower = input.toLowerCase().trim();
-  for (const prefix of CHAT_PREFIXES) {
-    if (lower.startsWith(prefix)) {
-      return "chat";
-    }
+  const trimmed = input.trim();
+  if (trimmed.startsWith('/')) {
+    return "xml";
   }
-  if (lower.endsWith("?")) {
-    return "chat";
-  }
-  return "xml";
+  return "chat";
 }
 
 // --- Typing Effect Component ---
@@ -213,7 +187,14 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
       id: "welcome",
       role: "assistant",
       content:
-        "I can help you understand and modify your architecture. Ask me questions or request changes:\n\n• \"Explain this architecture\"\n• \"Add a WAF in front of the ALB\"\n• \"Describe the data flow\"\n• \"Add CloudWatch monitoring\"\n• \"Suggest improvements\"",
+        "I can help you understand and modify your architecture.\n\n" +
+        "💬 **Chat:** Just type normally to ask questions\n" +
+        "• \"Explain this architecture\"\n" +
+        "• \"What are the costs?\"\n\n" +
+        "✏️ **Modify:** Start with / to change the diagram\n" +
+        "• \"/add a WAF in front of the ALB\"\n" +
+        "• \"/replace RDS with Aurora Serverless\"\n" +
+        "• \"/remove the NAT Gateway\"",
       timestamp: new Date(),
     },
   ]);
@@ -277,6 +258,11 @@ Be concise. Use realistic production defaults. Round costs to nearest dollar.`;
 
     // Detect mode based on input content
     const mode = detectMode(finalPrompt);
+
+    // Strip leading / for xml mode commands before sending to Lambda
+    if (mode === 'xml' && finalPrompt.startsWith('/')) {
+      finalPrompt = finalPrompt.slice(1).trim();
+    }
 
     try {
       const modelId = getSelectedModelId();
@@ -460,7 +446,7 @@ Be concise. Use realistic production defaults. Round costs to nearest dollar.`;
                   handleSubmit(e);
                 }
               }}
-              placeholder="Ask a question or describe changes..."
+              placeholder="Ask a question or type /command to modify..."
               className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               rows={2}
               disabled={isLoading}

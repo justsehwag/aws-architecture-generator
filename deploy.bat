@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo  AWS Architecture Generator - Deployment
+echo  Cloud Architecture Generator - Deployment
 echo  Region: ap-south-2 (Hyderabad)
 echo ============================================
 echo.

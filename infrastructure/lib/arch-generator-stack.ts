@@ -397,7 +397,7 @@ export class ArchGeneratorStack extends cdk.Stack {
 
     const httpApi = new apigatewayv2.HttpApi(this, 'ArchGeneratorApi', {
       apiName: 'arch-generator-api',
-      description: 'AWS Architecture Generator HTTP API',
+      description: 'Cloud Architecture Generator HTTP API',
       corsPreflight: {
         allowOrigins: ['*'],
         allowMethods: [

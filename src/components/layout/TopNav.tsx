@@ -49,8 +49,8 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
       </Button>
 
       <div className="flex items-center gap-2 ml-2 md:ml-0">
-        <span className="text-lg font-semibold tracking-tight" aria-label="AWS Architecture Generator">
-          AWS Architecture Generator
+        <span className="text-lg font-semibold tracking-tight" aria-label="Cloud Architecture Generator">
+          Cloud Architecture Generator
         </span>
       </div>
 

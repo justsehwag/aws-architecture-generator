@@ -10,5 +10,5 @@ new ArchGeneratorStack(app, 'ArchGeneratorStack', {
     account: '915233244358',
     region: 'ap-south-1',
   },
-  description: 'AWS Architecture Generator - Serverless deployment infrastructure',
+  description: 'Cloud Architecture Generator - Serverless deployment infrastructure',
 });

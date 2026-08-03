@@ -1,7 +1,7 @@
 {
   "name": "arch-generator-infrastructure",
   "version": "1.0.0",
-  "description": "AWS CDK infrastructure for AWS Architecture Generator",
+  "description": "AWS CDK infrastructure for Cloud Architecture Generator",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
