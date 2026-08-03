@@ -84,7 +84,7 @@ function LandingPage() {
       <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 text-center">
         <div className="max-w-2xl space-y-6">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#0033A0]/10 px-4 py-1.5 text-sm font-medium text-[#0033A0] dark:bg-[#00B4D8]/10 dark:text-[#00B4D8]">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -122,27 +122,27 @@ function LandingPage() {
 
           {/* Feature highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
-            <div className="rounded-lg border bg-card/50 p-4">
-              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
-                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="rounded-lg border bg-card/50 p-4 border-[#0033A0]/10 dark:border-[#00B4D8]/10">
+              <div className="h-8 w-8 rounded-md bg-[#0033A0]/10 dark:bg-[#00B4D8]/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-[#0033A0] dark:text-[#00B4D8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
               </div>
               <h3 className="text-sm font-semibold">Natural Language</h3>
               <p className="text-xs text-muted-foreground mt-1">Describe your architecture in plain English</p>
             </div>
-            <div className="rounded-lg border bg-card/50 p-4">
-              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
-                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="rounded-lg border bg-card/50 p-4 border-[#0033A0]/10 dark:border-[#00B4D8]/10">
+              <div className="h-8 w-8 rounded-md bg-[#0033A0]/10 dark:bg-[#00B4D8]/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-[#0033A0] dark:text-[#00B4D8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                 </svg>
               </div>
               <h3 className="text-sm font-semibold">Professional Diagrams</h3>
               <p className="text-xs text-muted-foreground mt-1">Official AWS icons, VPC containers, edge routing</p>
             </div>
-            <div className="rounded-lg border bg-card/50 p-4">
-              <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center mb-2">
-                <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="rounded-lg border bg-card/50 p-4 border-[#0033A0]/10 dark:border-[#00B4D8]/10">
+              <div className="h-8 w-8 rounded-md bg-[#0033A0]/10 dark:bg-[#00B4D8]/10 flex items-center justify-center mb-2">
+                <svg className="h-4 w-4 text-[#0033A0] dark:text-[#00B4D8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>

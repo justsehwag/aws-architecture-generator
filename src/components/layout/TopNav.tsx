@@ -35,12 +35,12 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
   return (
     <header
       role="banner"
-      className="sticky top-0 z-40 flex h-14 items-center border-b bg-background px-4 lg:px-6"
+      className="sticky top-0 z-50 w-full flex h-14 items-center border-b bg-[#001B44] text-white px-4 lg:px-6"
     >
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden"
+        className="md:hidden text-white hover:bg-white/10"
         onClick={onMenuToggle}
         aria-label="Toggle navigation menu"
         aria-expanded={undefined}
@@ -49,18 +49,18 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
       </Button>
 
       <div className="flex items-center gap-2 ml-2 md:ml-0">
-        <span className="text-lg font-semibold tracking-tight" aria-label="Cloud Architecture Generator">
+        <span className="text-sm font-bold text-white" aria-label="Cloud Architecture Generator">
           Cloud Architecture Generator
         </span>
       </div>
 
       <div className="flex-1 flex justify-center px-4">
         <div className="relative w-full max-w-md" role="search" aria-label="Site search">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" aria-hidden="true" />
           <input
             type="search"
             placeholder="Search diagrams, templates..."
-            className="w-full rounded-md border border-input bg-background px-9 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full rounded-md border border-white/20 bg-white/10 px-9 py-2 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001B44]"
             aria-label="Search diagrams and templates"
           />
         </div>
@@ -70,7 +70,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
         <ThemeToggle />
         <div className="relative">
           <button
-            className="flex items-center gap-2 rounded-full p-1 hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex items-center gap-2 rounded-full p-1 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
             aria-label="User menu"
             aria-haspopup="true"
             aria-expanded={userMenuOpen}
@@ -80,7 +80,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
               {initials}
             </div>
             {isAuthenticated && (
-              <span className="hidden text-sm font-medium text-foreground sm:inline">{displayName}</span>
+              <span className="hidden text-sm font-medium text-white/90 sm:inline">{displayName}</span>
             )}
           </button>
           {userMenuOpen && (

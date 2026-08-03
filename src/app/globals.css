@@ -34,59 +34,59 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 230 30% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 230 30% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --popover-foreground: 230 30% 12%;
+    --primary: 220 100% 31%;         /* #0033A0 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 193 100% 42%;       /* #00B4D8 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 193 100% 95%;          /* Light cyan */
+    --accent-foreground: 220 100% 31%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 100% 31%;
     --radius: 0.5rem;
 
     /* Focus ring color - ensures 3:1+ contrast against background in light mode.
-     * Light mode: ring is hsl(221.2 83.2% 53.3%) = #3b82f6 on white (#fff)
-     * Contrast ratio: ~4.5:1 ✓ (exceeds 3:1 minimum for focus indicators)
+     * Light mode: ring is hsl(220 100% 31%) = #0033A0 on white (#fff)
+     * Contrast ratio: ~7.5:1 ✓ (exceeds 3:1 minimum for focus indicators)
      */
-    --focus-ring: 221.2 83.2% 53.3%;
+    --focus-ring: 220 100% 31%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 7%;        /* #001B44 deep navy */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 40% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 40% 10%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 193 100% 42%;         /* #00B4D8 cyan accent in dark */
+    --primary-foreground: 222 47% 7%;
+    --secondary: 220 100% 31%;       /* Blue as secondary in dark */
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --muted: 222 30% 14%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 30% 14%;
+    --accent-foreground: 193 100% 42%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 20% 18%;
+    --input: 222 20% 18%;
+    --ring: 193 100% 42%;
 
     /* Focus ring color - ensures 3:1+ contrast against dark background.
-     * Dark mode: ring is hsl(224.3 76.3% 48%) = #2563eb on dark bg (#0f172a)
-     * Contrast ratio: ~4.2:1 ✓ (exceeds 3:1 minimum for focus indicators)
+     * Dark mode: ring is hsl(193 100% 42%) = #00B4D8 on dark bg (#001B44)
+     * Contrast ratio: ~5.8:1 ✓ (exceeds 3:1 minimum for focus indicators)
      */
-    --focus-ring: 224.3 76.3% 48%;
+    --focus-ring: 193 100% 42%;
   }
 }
 
