@@ -182,7 +182,7 @@ export default function DiagramViewerPage() {
           
           setDiagramData({
             diagramId: cachedData.diagramId ?? diagramId,
-            name: spec?.name ?? "Generated Diagram",
+            name: cachedData.name || spec?.name || "Generated Diagram",
             drawioXml: xml,
           });
           xmlRef.current = xml;
@@ -195,7 +195,7 @@ export default function DiagramViewerPage() {
             const drafts = JSON.parse(localStorage.getItem('diagram_drafts') || '[]');
             const exists = drafts.some((d: { diagramId: string }) => d.diagramId === cachedData.diagramId);
             if (!exists) {
-              drafts.unshift({ diagramId: cachedData.diagramId, name: spec?.name || 'Untitled', createdAt: new Date().toISOString(), spec });
+              drafts.unshift({ diagramId: cachedData.diagramId, name: cachedData.name || spec?.name || 'Untitled', createdAt: new Date().toISOString(), spec });
               if (drafts.length > 20) drafts.pop();
               localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
             }

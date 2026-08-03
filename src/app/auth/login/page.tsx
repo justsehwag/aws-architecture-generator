@@ -53,10 +53,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => {
-                const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN || 'arch-gen-915233.auth.ap-south-1.amazoncognito.com';
-                const clientId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID || '18foh3krd3gln4n2qin134oj6k';
-                const redirectUri = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_IN || 'https://main.d2ql9jf2g6mp1f.amplifyapp.com/auth/callback';
-                window.location.href = `https://${domain}/oauth2/authorize?identity_provider=GitHub&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=openid+email+profile`;
+                window.location.href = 'https://arch-gen-915233.auth.ap-south-1.amazoncognito.com/oauth2/authorize?identity_provider=GitHub&redirect_uri=https%3A%2F%2Fmain.d2ql9jf2g6mp1f.amplifyapp.com%2Fauth%2Fcallback&response_type=code&client_id=18foh3krd3gln4n2qin134oj6k&scope=openid+email+profile';
               }}
               disabled={isLoading}
               className="flex w-full items-center justify-center gap-2 rounded-md border bg-background px-4 py-2.5 text-sm font-medium transition-colors hover:bg-accent disabled:opacity-50"

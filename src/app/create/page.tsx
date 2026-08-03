@@ -60,10 +60,16 @@ function CreateDiagramContent() {
   // Watch for successful generation from the drawio generator hook
   useEffect(() => {
     if (drawioXml && drawioId) {
+      // Generate a meaningful name from the prompt (first 60 chars)
+      const diagramName = lastPrompt
+        ? lastPrompt.slice(0, 60).trim() + (lastPrompt.length > 60 ? '...' : '')
+        : 'Architecture Diagram';
+
       try {
         sessionStorage.setItem(`diagram_${drawioId}`, JSON.stringify({
           diagramId: drawioId,
           drawioXml,
+          name: diagramName,
         }));
       } catch {}
       setStep('generating-diagram');
@@ -71,7 +77,7 @@ function CreateDiagramContent() {
       setReady();
       router.push(`/diagram/${drawioId}`);
     }
-  }, [drawioXml, drawioId, router, setStep, setReady]);
+  }, [drawioXml, drawioId, router, setStep, setReady, lastPrompt]);
 
   // Handle errors from the drawio generator hook
   useEffect(() => {
