@@ -315,13 +315,43 @@ Be concise. Use realistic production defaults. Round costs to nearest dollar.`;
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        const aiMessage: ChatMessage = {
-          id: `msg-${Date.now()}-ai`,
-          role: "assistant",
-          content: `I couldn't process that. ${(errorData as { error?: string }).error || "Try being more specific."}`,
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, aiMessage]);
+        
+        // If XML mode failed, retry as chat mode so user always gets a response
+        if (mode === 'xml' && (errorData as { code?: string }).code === 'INVALID_XML') {
+          // Retry as chat mode
+          const retryResponse = await fetch(LAMBDA_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...payload, mode: 'chat', prompt: `The user asked to modify their architecture: "${messageText.trim().replace(/^\//, '')}". Explain what changes you would make and why. Be specific about which services to add/remove/modify.` }),
+          });
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            const aiMessage: ChatMessage = {
+              id: `msg-${Date.now()}-ai`,
+              role: "assistant",
+              content: `⚠️ I couldn't generate the diagram change directly. Here's what I'd recommend:\n\n${retryData.response || "Try being more specific with your command."}`,
+              timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, aiMessage]);
+          } else {
+            const aiMessage: ChatMessage = {
+              id: `msg-${Date.now()}-ai`,
+              role: "assistant",
+              content: "I couldn't process that command. Try being more specific, e.g. \"/add CloudWatch monitoring to all services\" or \"/add a WAF in front of the ALB\".",
+              timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, aiMessage]);
+          }
+        } else {
+          const aiMessage: ChatMessage = {
+            id: `msg-${Date.now()}-ai`,
+            role: "assistant",
+            content: `I couldn't process that. ${(errorData as { error?: string }).error || "Try being more specific."}`,
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        }
       }
     } catch {
       setMessages((prev) => [
