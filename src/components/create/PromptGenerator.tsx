@@ -151,6 +151,21 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
 
   return (
     <div className="space-y-4">
+      {/* Description */}
+      <div className="text-sm text-muted-foreground space-y-2">
+        <p>
+          Upload your infrastructure inventory, cloud configuration export, or paste documentation
+          below. I&apos;ll analyze it and generate an AWS architecture prompt for you.
+        </p>
+        <p>Examples of what you can upload:</p>
+        <ul className="list-disc list-inside space-y-0.5 ml-1">
+          <li>Server inventory spreadsheet (CSV/Excel)</li>
+          <li>Cloud configuration export (JSON)</li>
+          <li>Migration planning document (PDF/TXT)</li>
+          <li>Email thread discussing infrastructure requirements (EML)</li>
+        </ul>
+      </div>
+
       {/* File Upload Area */}
       <div>
         <label className="text-sm font-medium leading-none mb-2 block">

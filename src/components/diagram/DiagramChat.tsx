@@ -239,6 +239,20 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
   const submitMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
 
+    let finalPrompt = messageText.trim();
+
+    // Special handling for pricing estimate
+    if (finalPrompt === "Get AWS Pricing Estimate") {
+      finalPrompt = `Analyze the AWS services in my current architecture diagram and provide:
+
+1. A table listing each AWS service, its estimated configuration (instance type, storage, monthly requests), and estimated monthly cost in USD
+2. The total estimated monthly cost
+3. Key assumptions you made
+4. A direct link to https://calculator.aws where I can refine this estimate
+
+Use reasonable defaults for a production workload. Be concise.`;
+    }
+
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       role: "user",
@@ -251,13 +265,13 @@ export function DiagramChat({ currentXml, onArchitectureUpdate, className }: Dia
     setIsLoading(true);
 
     // Detect mode based on input content
-    const mode = detectMode(messageText.trim());
+    const mode = detectMode(finalPrompt);
 
     try {
       const modelId = getSelectedModelId();
 
       const payload: Record<string, unknown> = {
-        prompt: messageText.trim(),
+        prompt: finalPrompt,
         conversationHistory: buildConversationHistory(),
         mode,
       };
