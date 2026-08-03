@@ -262,6 +262,8 @@ Be concise. Use realistic production defaults. Round costs to nearest dollar.`;
     // Strip leading / for xml mode commands before sending to Lambda
     if (mode === 'xml' && finalPrompt.startsWith('/')) {
       finalPrompt = finalPrompt.slice(1).trim();
+      // Wrap with explicit instruction to modify and return complete XML
+      finalPrompt = `Modify the current architecture diagram to: ${finalPrompt}. Return the COMPLETE updated Draw.io mxGraphModel XML with all existing services preserved plus the requested changes.`;
     }
 
     try {
