@@ -36,7 +36,7 @@ const SUGGESTION_CHIPS = [
   { label: "Describe the data flow", mode: "chat" as const },
   { label: "Suggest improvements", mode: "chat" as const },
   { label: "List all services", mode: "chat" as const },
-  { label: "/add CloudWatch monitoring", mode: "xml" as const },
+  { label: "/replace with colorful AWS icons", mode: "xml" as const },
   { label: "Get AWS Pricing Estimate", mode: "chat" as const },
 ];
 
