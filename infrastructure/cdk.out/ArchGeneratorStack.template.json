@@ -1,5 +1,5 @@
 {
- "Description": "AWS Architecture Generator - Serverless deployment infrastructure",
+ "Description": "Cloud Architecture Generator - Serverless deployment infrastructure",
  "Resources": {
   "ArchGeneratorUserPoolD482F8D1": {
    "Type": "AWS::Cognito::UserPool",
@@ -920,7 +920,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
-     "S3Key": "efa2aaf93a568910c7a3e146ae8bd389f182c8fd4df2725251bf2b1d9f08f69a.zip"
+     "S3Key": "e4981fca05bed175874fb4ce326750e6151b4f154f49ba5a0733dda0ebb0f935.zip"
     },
     "Description": "Generates Draw.io XML directly from architecture prompts via Bedrock Claude Sonnet",
     "Environment": {
@@ -947,7 +947,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/DrawioGeneratorLambda/Resource",
-    "aws:asset:path": "asset.efa2aaf93a568910c7a3e146ae8bd389f182c8fd4df2725251bf2b1d9f08f69a",
+    "aws:asset:path": "asset.e4981fca05bed175874fb4ce326750e6151b4f154f49ba5a0733dda0ebb0f935",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1229,7 +1229,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-915233244358-ap-south-1",
-     "S3Key": "12da59c142bd6d79f21f7e65e6b3a92e299df826489ed3f074f4d2a6bf147a15.zip"
+     "S3Key": "01d7d7b2f4788d711d70a8918fbe58fe64856bbc78334ebdbdd57bc3cbed9895.zip"
     },
     "Description": "Generates Terraform, CDK, and CloudFormation code from diagrams",
     "Environment": {
@@ -1272,7 +1272,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ArchGeneratorStack/IaCLambda/Resource",
-    "aws:asset:path": "asset.12da59c142bd6d79f21f7e65e6b3a92e299df826489ed3f074f4d2a6bf147a15",
+    "aws:asset:path": "asset.01d7d7b2f4788d711d70a8918fbe58fe64856bbc78334ebdbdd57bc3cbed9895",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1352,7 +1352,7 @@
      ],
      "MaxAge": 3600
     },
-    "Description": "AWS Architecture Generator HTTP API",
+    "Description": "Cloud Architecture Generator HTTP API",
     "Name": "arch-generator-api",
     "ProtocolType": "HTTP"
    },
