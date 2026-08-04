@@ -150,7 +150,7 @@ export async function callBedrockWithRetry(
 
   const requestBody = JSON.stringify({
     anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: 16384,
+    max_tokens: 32768,
     temperature: 0.2,
     system: buildSystemPrompt(),
     messages,
