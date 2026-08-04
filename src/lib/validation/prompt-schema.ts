@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const PROMPT_MIN_LENGTH = 10;
-export const PROMPT_MAX_LENGTH = 5000;
+export const PROMPT_MAX_LENGTH = 10000;
 
 /**
  * Zod schema for validating architecture prompt input.
