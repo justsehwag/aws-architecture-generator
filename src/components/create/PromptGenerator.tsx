@@ -10,9 +10,9 @@ interface PromptGeneratorProps {
   isDisabled?: boolean;
 }
 
-const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml', '.xlsx', '.pdf'];
+const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml'];
 const ACCEPTED_MIME_TYPES =
-  '.csv,.xlsx,.pdf,.txt,.json,.eml,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/pdf,text/plain,application/json,message/rfc822';
+  '.csv,.txt,.json,.eml,text/csv,text/plain,application/json,message/rfc822';
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 const LAMBDA_URL =
@@ -197,7 +197,7 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
         </p>
         <p>Examples of what you can upload:</p>
         <ul className="list-disc list-inside space-y-0.5 ml-1">
-          <li>Server inventory spreadsheet (<strong>CSV</strong> — save Excel as CSV first)</li>
+          <li>Server inventory spreadsheet (CSV)</li>
           <li>Azure/GCP billing export or resource list (CSV/JSON)</li>
           <li>Cloud configuration export (JSON/TXT)</li>
           <li>Migration planning document (TXT)</li>
