@@ -286,6 +286,10 @@ Below is a correctly structured diagram showing a VPC with public/private subnet
 6. Maintain proper parent-child nesting for containers (VPC > AZ > Subnet > Service).
 7. All connections must use edgeStyle=orthogonalEdgeStyle;rounded=1 with appropriate stroke color.
 8. Service icon nodes must be 60x60 pixels. Containers must be at least 300x200 pixels.
-9. Maintain minimum 120px horizontal and 100px vertical spacing between nodes.
-10. Position elements logically: public-facing services at the top, databases at the bottom, left-to-right data flow.`;
+9. Maintain minimum 160px horizontal and 140px vertical spacing between nodes to AVOID icon/text overlap.
+10. Position elements logically: public-facing services at the top, databases at the bottom, left-to-right data flow.
+11. Do NOT add multi-AZ, autoscaling, or high-availability patterns unless the user EXPLICITLY mentions them in their prompt.
+12. Use a SINGLE availability zone by default. Only add multiple AZs if the user says "multi-AZ", "high availability", or "HA".
+13. Map services 1:1 — if user mentions 5 servers, create 5 separate EC2 nodes (not one autoscaling group).
+14. Make containers LARGE ENOUGH to fit all child nodes without overlapping. Minimum 400px width if >3 services inside.`;
 }

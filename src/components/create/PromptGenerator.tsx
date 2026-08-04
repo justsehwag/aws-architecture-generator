@@ -19,19 +19,21 @@ const LAMBDA_URL =
   process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL ||
   'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
 
-const SYSTEM_INSTRUCTION = `You are an AWS migration and architecture expert. Analyze the following infrastructure inventory, billing data, or documentation. This may include on-premises servers, Azure services, GCP services, or any other cloud/infrastructure data.
+const SYSTEM_INSTRUCTION = `You are a cloud architecture expert. Analyze the following infrastructure inventory, billing data, or documentation. This may include on-premises servers, Azure services, GCP services, or any other cloud/infrastructure data.
+
+CRITICAL RULES:
+1. Do NOT add high-availability patterns (multi-AZ, autoscaling) unless the user explicitly asks for it
+2. Do NOT consolidate multiple individual servers into one autoscaling group — if the inventory shows 5 separate servers, map them to 5 separate EC2 instances
+3. Map each service 1:1 to its cloud equivalent — keep the SAME count of resources
+4. Use a SINGLE availability zone layout unless multi-AZ is explicitly requested
+5. Do NOT add services that aren't in the inventory (no extra monitoring, backup, or HA unless asked)
 
 Your job:
-1. Identify all services, workloads, and their relationships
-2. Map each service to the BEST equivalent AWS service (e.g., Azure App Service → AWS Elastic Beanstalk/ECS, GCP Cloud Functions → AWS Lambda, Azure SQL → Amazon RDS, GCP BigQuery → Amazon Redshift/Athena)
-3. Generate a detailed AWS architecture description prompt that includes:
-   - All AWS services needed
-   - Network topology (VPC, subnets, availability zones)
-   - Data flow and connections between services
-   - Security groups and access patterns
-   - Storage and database services
+1. Identify all services, workloads, and their relationships from the inventory
+2. Map each service to its equivalent AWS service (1:1 mapping, same quantity)
+3. Generate a concise architecture prompt listing the exact services and their connections
 
-Output ONLY the architecture prompt text (no explanation, no preamble). The prompt should be ready to generate a Draw.io diagram.
+Output ONLY the architecture prompt text (no explanation, no preamble). Keep it simple and factual based on what's in the inventory.
 
 Content to analyze:
 
