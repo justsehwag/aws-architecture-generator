@@ -10,7 +10,7 @@ interface PromptGeneratorProps {
   isDisabled?: boolean;
 }
 
-const ACCEPTED_EXTENSIONS = ['.csv', '.xlsx', '.pdf', '.txt', '.json', '.eml'];
+const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml', '.xlsx', '.pdf'];
 const ACCEPTED_MIME_TYPES =
   '.csv,.xlsx,.pdf,.txt,.json,.eml,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/pdf,text/plain,application/json,message/rfc822';
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -85,6 +85,20 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
+      
+      // Check if the content looks like binary/corrupt data (XLSX, PDF)
+      const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (ext === '.xlsx' || ext === '.pdf') {
+        setFileError(`${ext.toUpperCase()} files contain binary data that cannot be read directly. Please save as CSV or TXT and re-upload.`);
+        return;
+      }
+      
+      // Verify the content is readable text (not binary garbage)
+      if (content.includes('\x00') || content.startsWith('PK')) {
+        setFileError('This file appears to be binary. Please save as CSV or TXT format and re-upload.');
+        return;
+      }
+      
       setUploadedFile(file);
       setUploadedContent(content);
     };
@@ -183,10 +197,10 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
         </p>
         <p>Examples of what you can upload:</p>
         <ul className="list-disc list-inside space-y-0.5 ml-1">
-          <li>Server inventory spreadsheet (CSV/Excel)</li>
+          <li>Server inventory spreadsheet (<strong>CSV</strong> — save Excel as CSV first)</li>
           <li>Azure/GCP billing export or resource list (CSV/JSON)</li>
           <li>Cloud configuration export (JSON/TXT)</li>
-          <li>Migration planning document (PDF/TXT)</li>
+          <li>Migration planning document (TXT)</li>
           <li>Email thread discussing infrastructure requirements (EML)</li>
         </ul>
       </div>
