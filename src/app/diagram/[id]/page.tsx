@@ -156,12 +156,6 @@ export default function DiagramViewerPage() {
   const [isResizing, setIsResizing] = React.useState(false);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
-  // --- Resizable chat panel state ---
-  const [chatWidth, setChatWidth] = React.useState(384); // default 24rem (w-96)
-  const resizingRef = React.useRef(false);
-  const startXRef = React.useRef(0);
-  const startWidthRef = React.useRef(384);
-
   // Track current XML for autosave
   const xmlRef = React.useRef<string>("");
 
