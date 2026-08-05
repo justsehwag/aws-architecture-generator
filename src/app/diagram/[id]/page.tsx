@@ -151,6 +151,7 @@ export default function DiagramViewerPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [chatOpen, setChatOpen] = React.useState(true);
+  const [chatExpanded, setChatExpanded] = React.useState(false);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
   // --- Resizable chat panel state ---
@@ -442,15 +443,27 @@ export default function DiagramViewerPage() {
           )}
         </main>
 
-        {/* Chat panel — resizable with floating icon when closed */}
+        {/* Chat panel — with expand/maximize for bigger screen */}
         {chatOpen ? (
-          <aside className="flex-shrink-0 relative border-l border-border" style={{ width: '384px', minWidth: '280px', maxWidth: '600px' }}>
+          <aside className="flex-shrink-0 relative border-l border-border" style={{ width: chatExpanded ? '50%' : '384px', minWidth: '280px', maxWidth: chatExpanded ? '50%' : '600px', transition: 'width 0.2s ease' }}>
+            {/* Expand/collapse button at top of chat panel */}
+            <button
+              onClick={() => setChatExpanded(!chatExpanded)}
+              className="absolute top-3 left-3 z-20 flex h-7 w-7 items-center justify-center rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={chatExpanded ? "Shrink chat" : "Expand chat"}
+              title={chatExpanded ? "Shrink panel" : "Expand panel"}
+            >
+              {chatExpanded ? (
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" /></svg>
+              ) : (
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+              )}
+            </button>
             <DiagramChat
               currentXml={diagramData.drawioXml}
               onArchitectureUpdate={(xml) => {
                 setDiagramData(prev => prev ? { ...prev, drawioXml: xml } : prev);
                 xmlRef.current = xml;
-                // Persist chatbot changes to sessionStorage and localStorage
                 try {
                   sessionStorage.setItem(`diagram_${diagramId}`, JSON.stringify({
                     diagramId,
@@ -470,7 +483,6 @@ export default function DiagramViewerPage() {
                   }
                   localStorage.setItem('diagram_drafts', JSON.stringify(drafts));
                 } catch {}
-                // Persist to DynamoDB for cross-device sync (non-blocking)
                 fetch('/api/diagrams/save', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -489,11 +501,11 @@ export default function DiagramViewerPage() {
         ) : (
           <button
             onClick={() => setChatOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-110 animate-bounce"
-            aria-label="Open chat assistant"
+            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-110"
+            aria-label="Maximize chat assistant"
             title="Open Architecture Assistant"
           >
-            <MessageSquare className="h-6 w-6" />
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
           </button>
         )}
       </div>
