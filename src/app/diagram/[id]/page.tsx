@@ -153,6 +153,12 @@ export default function DiagramViewerPage() {
   const [chatOpen, setChatOpen] = React.useState(true);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
+  // --- Resizable chat panel state ---
+  const [chatWidth, setChatWidth] = React.useState(384); // default 24rem (w-96)
+  const resizingRef = React.useRef(false);
+  const startXRef = React.useRef(0);
+  const startWidthRef = React.useRef(384);
+
   // Track current XML for autosave
   const xmlRef = React.useRef<string>("");
 
@@ -298,6 +304,30 @@ export default function DiagramViewerPage() {
       });
   }, [diagramId]);
 
+  // --- Resize handler for chat panel ---
+  const handleResizeStart = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    resizingRef.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = chatWidth;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!resizingRef.current) return;
+      const delta = startXRef.current - moveEvent.clientX;
+      const newWidth = Math.min(Math.max(startWidthRef.current + delta, 280), 600);
+      setChatWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      resizingRef.current = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [chatWidth]);
+
   // (Tabs removed — chatbot replaces side panels)
 
   // --- Loading state ---
@@ -366,7 +396,7 @@ export default function DiagramViewerPage() {
             variant="ghost"
             size="sm"
             onClick={() => setChatOpen(!chatOpen)}
-            aria-label={chatOpen ? "Close chat" : "Open chat"}
+            aria-label={chatOpen ? "Minimize chat" : "Open chat"}
           >
             <MessageSquare className="h-4 w-4" />
           </Button>
@@ -412,9 +442,9 @@ export default function DiagramViewerPage() {
           )}
         </main>
 
-        {/* Chat panel */}
-        {chatOpen && (
-          <aside className="w-80 flex-shrink-0 lg:w-96">
+        {/* Chat panel — resizable with floating icon when closed */}
+        {chatOpen ? (
+          <aside className="flex-shrink-0 relative border-l border-border" style={{ width: '384px', minWidth: '280px', maxWidth: '600px' }}>
             <DiagramChat
               currentXml={diagramData.drawioXml}
               onArchitectureUpdate={(xml) => {
@@ -456,6 +486,15 @@ export default function DiagramViewerPage() {
               className="h-full"
             />
           </aside>
+        ) : (
+          <button
+            onClick={() => setChatOpen(true)}
+            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-110 animate-bounce"
+            aria-label="Open chat assistant"
+            title="Open Architecture Assistant"
+          >
+            <MessageSquare className="h-6 w-6" />
+          </button>
         )}
       </div>
 
