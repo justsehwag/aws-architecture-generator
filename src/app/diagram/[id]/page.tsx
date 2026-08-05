@@ -152,6 +152,8 @@ export default function DiagramViewerPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [chatOpen, setChatOpen] = React.useState(true);
   const [chatExpanded, setChatExpanded] = React.useState(false);
+  const [chatWidth, setChatWidth] = React.useState(384);
+  const [isResizing, setIsResizing] = React.useState(false);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
   // --- Resizable chat panel state ---
@@ -396,10 +398,15 @@ export default function DiagramViewerPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setChatOpen(!chatOpen)}
-            aria-label={chatOpen ? "Minimize chat" : "Open chat"}
+            onClick={() => { setChatOpen(!chatOpen); setChatExpanded(false); }}
+            aria-label={chatOpen ? "Expand diagram (close chat)" : "Show chat panel"}
+            title={chatOpen ? "Expand diagram" : "Show chat"}
           >
-            <MessageSquare className="h-4 w-4" />
+            {chatOpen ? (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+            ) : (
+              <MessageSquare className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </header>
@@ -443,22 +450,40 @@ export default function DiagramViewerPage() {
           )}
         </main>
 
-        {/* Chat panel — with expand/maximize for bigger screen */}
+        {/* Chat panel — drag to resize from left edge */}
         {chatOpen ? (
-          <aside className="flex-shrink-0 relative border-l border-border" style={{ width: chatExpanded ? '50%' : '384px', minWidth: '280px', maxWidth: chatExpanded ? '50%' : '600px', transition: 'width 0.2s ease' }}>
-            {/* Expand/collapse button at top of chat panel */}
-            <button
-              onClick={() => setChatExpanded(!chatExpanded)}
-              className="absolute top-3 left-3 z-20 flex h-7 w-7 items-center justify-center rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={chatExpanded ? "Shrink chat" : "Expand chat"}
-              title={chatExpanded ? "Shrink panel" : "Expand panel"}
+          <aside className="flex-shrink-0 relative border-l border-border" style={{ width: `${chatWidth}px`, transition: isResizing ? 'none' : 'width 0.2s ease' }}>
+            {/* Drag handle for resizing */}
+            <div
+              className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-primary/30 active:bg-primary/50 z-10 group"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setIsResizing(true);
+                const startX = e.clientX;
+                const startWidth = chatWidth;
+                
+                const handleMouseMove = (moveEvent: MouseEvent) => {
+                  const delta = startX - moveEvent.clientX;
+                  const newWidth = Math.min(Math.max(startWidth + delta, 280), 700);
+                  setChatWidth(newWidth);
+                };
+                
+                const handleMouseUp = () => {
+                  setIsResizing(false);
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = '';
+                  document.body.style.userSelect = '';
+                };
+                
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
             >
-              {chatExpanded ? (
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" /></svg>
-              ) : (
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
-              )}
-            </button>
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-border group-hover:bg-primary/50 transition-colors" />
+            </div>
             <DiagramChat
               currentXml={diagramData.drawioXml}
               onArchitectureUpdate={(xml) => {
