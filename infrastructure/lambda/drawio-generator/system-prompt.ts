@@ -276,7 +276,7 @@ Below is a correctly structured diagram showing a VPC with public/private subnet
   </root>
 </mxGraphModel>
 
-## Output Rules
+## Output Rules — CRITICAL LAYOUT REQUIREMENTS
 
 1. Respond with ONLY the raw XML. No markdown fences (\`\`\`), no explanation, no comments before or after the XML.
 2. The response must start with <mxGraphModel> and end with </mxGraphModel>.
@@ -285,11 +285,24 @@ Below is a correctly structured diagram showing a VPC with public/private subnet
 5. If a service type is not in the mapping table, use a generic rectangle: rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;fontSize=12;
 6. Maintain proper parent-child nesting for containers (VPC > AZ > Subnet > Service).
 7. All connections must use edgeStyle=orthogonalEdgeStyle;rounded=1 with appropriate stroke color.
-8. Service icon nodes must be 60x60 pixels. Containers must be at least 300x200 pixels.
-9. Maintain minimum 160px horizontal and 140px vertical spacing between nodes to AVOID icon/text overlap.
+8. Service icon nodes must be 60x60 pixels. Containers must be at least 400x250 pixels.
+9. **SPACING IS CRITICAL — NO OVERLAPS ALLOWED:**
+   - Minimum 180px HORIZONTAL gap between adjacent service nodes
+   - Minimum 160px VERTICAL gap between adjacent service nodes
+   - Labels appear BELOW icons (verticalLabelPosition=bottom) — account for 30px label height
+   - Never place two nodes closer than 180px center-to-center
 10. Position elements logically: public-facing services at the top, databases at the bottom, left-to-right data flow.
-11. Do NOT add multi-AZ, autoscaling, or high-availability patterns unless the user EXPLICITLY mentions them in their prompt.
+11. Do NOT add multi-AZ, autoscaling, or high-availability patterns unless the user EXPLICITLY mentions them.
 12. Use a SINGLE availability zone by default. Only add multiple AZs if the user says "multi-AZ", "high availability", or "HA".
 13. Map services 1:1 — if user mentions 5 servers, create 5 separate EC2 nodes (not one autoscaling group).
-14. Make containers LARGE ENOUGH to fit all child nodes without overlapping. Minimum 400px width if >3 services inside.`;
+14. **CONTAINER SIZING:** Calculate container dimensions based on number of children:
+    - 1-2 services: 400x250 minimum
+    - 3-4 services: 600x300 minimum
+    - 5+ services: 800x350 minimum
+    - Always add 80px padding on all sides of the container beyond the outermost service
+15. **GRID LAYOUT:** Place services in a grid pattern within containers:
+    - Row 1 starts at y=60 (below container title)
+    - Each subsequent row at y += 180
+    - Column 1 starts at x=80
+    - Each subsequent column at x += 180`;
 }

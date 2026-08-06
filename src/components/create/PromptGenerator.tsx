@@ -10,9 +10,9 @@ interface PromptGeneratorProps {
   isDisabled?: boolean;
 }
 
-const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml'];
+const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml', '.xlsx'];
 const ACCEPTED_MIME_TYPES =
-  '.csv,.txt,.json,.eml,text/csv,text/plain,application/json,message/rfc822';
+  '.csv,.txt,.json,.eml,.xlsx,text/csv,text/plain,application/json,message/rfc822,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 const LAMBDA_URL =
@@ -86,16 +86,14 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
     reader.onload = (e) => {
       const content = e.target?.result as string;
       
-      // Check if the content looks like binary/corrupt data (XLSX, PDF)
+      // Check if the content looks like binary/corrupt data
       const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (ext === '.xlsx' || ext === '.pdf') {
-        setFileError(`${ext.toUpperCase()} files contain binary data that cannot be read directly. Please save as CSV or TXT and re-upload.`);
-        return;
-      }
-      
-      // Verify the content is readable text (not binary garbage)
-      if (content.includes('\x00') || content.startsWith('PK')) {
-        setFileError('This file appears to be binary. Please save as CSV or TXT format and re-upload.');
+      if (content.startsWith('PK') || content.includes('\x00')) {
+        if (ext === '.xlsx') {
+          setFileError('Excel files (.xlsx) are binary and cannot be read directly in the browser. Please save your spreadsheet as CSV (File → Save As → CSV) and upload the .csv file instead.');
+        } else {
+          setFileError('This file appears to be binary. Please save as CSV or TXT format and re-upload.');
+        }
         return;
       }
       
@@ -197,7 +195,7 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
         </p>
         <p>Examples of what you can upload:</p>
         <ul className="list-disc list-inside space-y-0.5 ml-1">
-          <li>Server inventory spreadsheet (CSV)</li>
+          <li>Server inventory spreadsheet (CSV — for Excel, save as CSV first)</li>
           <li>Azure/GCP billing export or resource list (CSV/JSON)</li>
           <li>Cloud configuration export (JSON/TXT)</li>
           <li>Migration planning document (TXT)</li>
