@@ -10,9 +10,9 @@ interface PromptGeneratorProps {
   isDisabled?: boolean;
 }
 
-const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml', '.xlsx'];
+const ACCEPTED_EXTENSIONS = ['.csv', '.txt', '.json', '.eml', '.xlsx', '.xls', '.pdf', '.docx', '.doc'];
 const ACCEPTED_MIME_TYPES =
-  '.csv,.txt,.json,.eml,.xlsx,text/csv,text/plain,application/json,message/rfc822,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  '.csv,.txt,.json,.eml,.xlsx,.xls,.pdf,.docx,.doc,text/csv,text/plain,application/json,message/rfc822,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 const LAMBDA_URL =
@@ -82,28 +82,43 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      
-      // Check if the content looks like binary/corrupt data
-      const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (content.startsWith('PK') || content.includes('\x00')) {
-        if (ext === '.xlsx') {
-          setFileError('Excel files (.xlsx) are binary and cannot be read directly in the browser. Please save your spreadsheet as CSV (File → Save As → CSV) and upload the .csv file instead.');
-        } else {
-          setFileError('This file appears to be binary. Please save as CSV or TXT format and re-upload.');
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    const binaryExtensions = ['.xlsx', '.xls', '.pdf', '.docx', '.doc'];
+
+    if (binaryExtensions.includes(ext)) {
+      // Read binary files as base64
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
         }
-        return;
-      }
-      
-      setUploadedFile(file);
-      setUploadedContent(content);
-    };
-    reader.onerror = () => {
-      setFileError('Unable to read file. Please try a different file.');
-    };
-    reader.readAsText(file);
+        const base64 = btoa(binary);
+        // Truncate to avoid token limits
+        const truncated = base64.slice(0, 50000);
+        const content = `[Uploaded file: ${file.name} (${ext} format, ${(file.size / 1024).toFixed(1)}KB)]\n\nThis is a binary document encoded in base64. Please extract and interpret the text content, tables, and data from this document:\n\n${truncated}`;
+        setUploadedFile(file);
+        setUploadedContent(content);
+      };
+      reader.onerror = () => {
+        setFileError('Unable to read file. Please try a different file.');
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // Read text files normally
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setUploadedFile(file);
+        setUploadedContent(content);
+      };
+      reader.onerror = () => {
+        setFileError('Unable to read file. Please try a different file.');
+      };
+      reader.readAsText(file);
+    }
   }, []);
 
   const handleDrop = useCallback(
@@ -195,11 +210,11 @@ export function PromptGenerator({ onPromptGenerated, isDisabled = false }: Promp
         </p>
         <p>Examples of what you can upload:</p>
         <ul className="list-disc list-inside space-y-0.5 ml-1">
-          <li>Server inventory spreadsheet (CSV — for Excel, save as CSV first)</li>
-          <li>Azure/GCP billing export or resource list (CSV/JSON)</li>
+          <li>Server inventory spreadsheet (CSV, Excel)</li>
+          <li>Azure/GCP billing export (CSV/JSON/Excel)</li>
           <li>Cloud configuration export (JSON/TXT)</li>
-          <li>Migration planning document (TXT)</li>
-          <li>Email thread discussing infrastructure requirements (EML)</li>
+          <li>Migration planning document (PDF, Word, TXT)</li>
+          <li>Email thread discussing infrastructure (EML)</li>
         </ul>
       </div>
 

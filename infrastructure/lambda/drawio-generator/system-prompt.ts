@@ -158,7 +158,7 @@ Every diagram MUST use this boilerplate structure:
 ## AWS Service Shape Styling
 
 Use COLORFUL category-based fill colors for AWS service icons. The style format is:
-shape=<shape_id>;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=<CATEGORY_COLOR>;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;
+outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=<CATEGORY_COLOR>;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=<shape_id>
 
 Category colors (use these as fillColor based on service category):
 - Compute (Lambda, EC2, ECS, EKS, Fargate, Batch): fillColor=#ED7100
@@ -252,16 +252,16 @@ Below is a correctly structured diagram showing a VPC with public/private subnet
     <mxCell id="privsub1" value="Private Subnet (10.0.2.0/24)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;strokeColor=#147EBA;fillColor=#EFF6FF;verticalAlign=top;align=left;spacingLeft=10;fontColor=#147EBA;dashed=1;" vertex="1" parent="vpc1">
       <mxGeometry x="20" y="280" width="340" height="200" as="geometry" />
     </mxCell>
-    <mxCell id="nat1" value="NAT Gateway" style="shape=mxgraph.aws4.nat_gateway;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;" vertex="1" parent="pubsub1">
+    <mxCell id="nat1" value="NAT Gateway" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.nat_gateway" vertex="1" parent="pubsub1">
       <mxGeometry x="40" y="70" width="60" height="60" as="geometry" />
     </mxCell>
-    <mxCell id="alb1" value="Application Load Balancer" style="shape=mxgraph.aws4.application_load_balancer;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;" vertex="1" parent="pubsub1">
+    <mxCell id="alb1" value="Application Load Balancer" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.application_load_balancer" vertex="1" parent="pubsub1">
       <mxGeometry x="200" y="70" width="60" height="60" as="geometry" />
     </mxCell>
-    <mxCell id="ec2_1" value="EC2 Instance" style="shape=mxgraph.aws4.ec2;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;" vertex="1" parent="privsub1">
+    <mxCell id="ec2_1" value="EC2 Instance" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2" vertex="1" parent="privsub1">
       <mxGeometry x="40" y="70" width="60" height="60" as="geometry" />
     </mxCell>
-    <mxCell id="rds1" value="RDS Database" style="shape=mxgraph.aws4.rds;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;" vertex="1" parent="privsub1">
+    <mxCell id="rds1" value="RDS Database" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds" vertex="1" parent="privsub1">
       <mxGeometry x="200" y="70" width="60" height="60" as="geometry" />
     </mxCell>
     <mxCell id="edge1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9900;strokeWidth=2;" edge="1" source="alb1" target="ec2_1" parent="1">
