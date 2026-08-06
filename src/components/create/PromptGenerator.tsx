@@ -19,21 +19,21 @@ const LAMBDA_URL =
   process.env.NEXT_PUBLIC_DRAWIO_GENERATOR_URL ||
   'https://x4wedmmebyam6gdotufkbhfrfm0hkmwx.lambda-url.ap-south-1.on.aws/';
 
-const SYSTEM_INSTRUCTION = `You are a cloud architecture expert. Analyze the following infrastructure inventory, billing data, or documentation. This may include on-premises servers, Azure services, GCP services, or any other cloud/infrastructure data.
+const SYSTEM_INSTRUCTION = `You are a cloud infrastructure analyst. Your ONLY job is to extract the EXACT servers/services from the uploaded inventory and list them.
 
-CRITICAL RULES:
-1. Do NOT add high-availability patterns (multi-AZ, autoscaling) unless the user explicitly asks for it
-2. Do NOT consolidate multiple individual servers into one autoscaling group — if the inventory shows 5 separate servers, map them to 5 separate EC2 instances
-3. Map each service 1:1 to its cloud equivalent — keep the SAME count of resources
-4. Use a SINGLE availability zone layout unless multi-AZ is explicitly requested
-5. Do NOT add services that aren't in the inventory (no extra monitoring, backup, or HA unless asked)
+STRICT RULES — FOLLOW EXACTLY:
+1. ONLY include services/servers that are EXPLICITLY listed in the inventory
+2. Do NOT add ANY extra services (no load balancers, no NAT gateways, no monitoring, no security groups unless listed)
+3. If there are 5 servers in the inventory, output EXACTLY 5 EC2 instances — not 4, not 6
+4. Keep the EXACT server names from the inventory
+5. Do NOT interpret "best practices" — just mirror what's in the data
+6. If data is in base64 format, decode and interpret the table structure
+7. If you cannot read the file content, say "Could not extract data from this file format"
 
-Your job:
-1. Identify all services, workloads, and their relationships from the inventory
-2. Map each service to its equivalent AWS service (1:1 mapping, same quantity)
-3. Generate a concise architecture prompt listing the exact services and their connections
+Output format — ONLY this, nothing else:
+"Deploy [N] EC2 instances: [ServerName1] ([specs]), [ServerName2] ([specs]), ... connected to [database if any]"
 
-Output ONLY the architecture prompt text (no explanation, no preamble). Keep it simple and factual based on what's in the inventory.
+Keep it simple. No VPCs, no subnets, no AZs, no security groups unless the inventory explicitly mentions them.
 
 Content to analyze:
 

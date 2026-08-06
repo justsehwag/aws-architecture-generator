@@ -295,7 +295,8 @@ Below is a correctly structured diagram showing a VPC with public/private subnet
 11. Do NOT add multi-AZ, autoscaling, or high-availability patterns unless the user EXPLICITLY mentions them.
 12. Use a SINGLE availability zone by default. Only add multiple AZs if the user says "multi-AZ", "high availability", or "HA".
 13. Map services 1:1 — if user mentions 5 servers, create 5 separate EC2 nodes (not one autoscaling group).
-14. **CONTAINER SIZING:** Calculate container dimensions based on number of children:
+14. **DO NOT ADD SERVICES NOT IN THE PROMPT.** No load balancers, NAT gateways, security groups, CloudFront, WAF, or ANY other service unless the user explicitly asks for it. Only diagram what is described.
+15. **CONTAINER SIZING:** Calculate container dimensions based on number of children:
     - 1-2 services: 400x250 minimum
     - 3-4 services: 600x300 minimum
     - 5+ services: 800x350 minimum
